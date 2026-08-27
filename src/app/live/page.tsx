@@ -31,7 +31,7 @@ export default async function LivePage() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <AutoRefresh seconds={15} />
+      <AutoRefresh />
       <PublicHeader name={event.name} host={event.host} liveMode={event.liveMode} />
 
       <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 p-4 sm:p-6">
@@ -140,7 +140,7 @@ export default async function LivePage() {
             </section>
 
             <p className="text-center text-xs text-muted-foreground">
-              Skor diperbarui otomatis setiap 15 detik
+              Skor diperbarui otomatis secara langsung
             </p>
           </>
         )}
