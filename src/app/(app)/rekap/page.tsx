@@ -180,7 +180,7 @@ export default async function RekapPage() {
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {event.categories.map((c) => {
-          const winners = categoryRanking(teams, c.id).slice(0, 3)
+          const winners = categoryRanking(teams, c.id)
           return (
             <div key={c.id} className="rounded-xl bg-card p-4 shadow-sm ring-1 ring-border">
               <h3 className="font-semibold">
@@ -193,7 +193,7 @@ export default async function RekapPage() {
                 {winners.map((w, i) => (
                   <li key={w.team.teamId} className="flex items-center justify-between gap-2">
                     <span className="flex-1 truncate">
-                      <span className="mr-1.5">{isMedal ? ['🥇', '🥈', '🥉'][i] : `${i + 1}.`}</span>
+                      <span className="mr-1.5">{isMedal && w.cat.medal ? MEDAL_EMOJI[w.cat.medal] : `${i + 1}.`}</span>
                       {w.team.name}
                     </span>
                     <span className="font-semibold tabular-nums">{w.cat.raw}</span>
