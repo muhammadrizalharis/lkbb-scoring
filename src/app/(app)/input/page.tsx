@@ -18,7 +18,7 @@ export default async function InputIndexPage() {
 
   if (event.teams.length === 0 || event.judges.length === 0) {
     return (
-      <div className="rounded-xl bg-amber-50 p-6 text-sm text-amber-900 ring-1 ring-amber-200">
+      <div className="rounded-xl bg-warning/10 p-6 text-sm text-amber-700 dark:text-amber-200 ring-1 ring-warning/30">
         Tambahkan <Link href="/admin/tim" className="font-semibold underline">tim</Link> dan{' '}
         <Link href="/admin/juri" className="font-semibold underline">juri</Link> dulu sebelum memasukkan nilai.
       </div>
@@ -31,39 +31,39 @@ export default async function InputIndexPage() {
     <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-bold">Input Nilai</h1>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-muted-foreground">
           Pilih kotak untuk memasukkan lembar nilai. Hijau = selesai, kuning = tersimpan sebagian.
         </p>
       </div>
 
-      <div className="overflow-x-auto rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+      <div className="overflow-x-auto rounded-xl bg-card shadow-sm ring-1 ring-border">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="bg-slate-50">
-              <th className="sticky left-0 z-10 bg-slate-50 px-3 py-2 text-left">Tim</th>
+            <tr className="bg-muted">
+              <th className="sticky left-0 z-10 bg-muted px-3 py-2 text-left">Tim</th>
               {event.judges.map((j) => (
                 <th key={j.id} className="px-2 py-2 text-center font-medium">
                   <div>{j.code}</div>
-                  <div className="text-xs font-normal text-slate-500">{j.category.code}</div>
+                  <div className="text-xs font-normal text-muted-foreground">{j.category.code}</div>
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-border">
             {event.teams.map((team) => (
               <tr key={team.id}>
-                <td className="sticky left-0 z-10 bg-white px-3 py-2 whitespace-nowrap">
-                  <span className="mr-2 text-slate-400 tabular-nums">{team.number}</span>
+                <td className="sticky left-0 z-10 bg-card px-3 py-2 whitespace-nowrap">
+                  <span className="mr-2 text-muted-foreground tabular-nums">{team.number}</span>
                   {team.name}
                 </td>
                 {event.judges.map((judge) => {
                   const sheet = sheetMap.get(`${team.id}:${judge.id}`)
                   const tone =
                     sheet?.status === 'FINAL'
-                      ? 'bg-emerald-100 text-emerald-900 hover:bg-emerald-200'
+                      ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/25'
                       : sheet
-                        ? 'bg-amber-100 text-amber-900 hover:bg-amber-200'
-                        : 'bg-slate-100 text-slate-400 hover:bg-slate-200'
+                        ? 'bg-amber-500/15 text-amber-700 dark:text-amber-200 hover:bg-amber-500/25'
+                        : 'bg-muted text-muted-foreground hover:bg-accent'
                   return (
                     <td key={judge.id} className="px-1 py-1 text-center">
                       <Link

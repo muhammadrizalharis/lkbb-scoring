@@ -47,39 +47,39 @@ export default async function EditCategoryPage({
 
   return (
     <div className="space-y-6">
-      <Link href="/admin/rubrik" className="text-sm text-slate-600 underline">
+      <Link href="/admin/rubrik" className="text-sm text-muted-foreground underline">
         ← Kembali ke daftar kategori
       </Link>
 
       <div>
         <h1 className="text-2xl font-bold">Sunting: {category.name}</h1>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-muted-foreground">
           {criteriaTotal} butir · rentang otomatis {category.minScore}–{category.maxScore}
         </p>
       </div>
 
       {locked && (
-        <div className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900 ring-1 ring-amber-200">
+        <div className="rounded-xl bg-warning/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-200 ring-1 ring-warning/30">
           Kategori ini sudah memiliki nilai tersimpan, jadi <b>struktur terkunci</b>. Nama masih boleh
           diubah, tetapi menambah/menghapus butir dan mengubah pilihan nilai dinonaktifkan agar nilai
           yang sudah masuk tidak menjadi tidak sah.
         </div>
       )}
 
-      <div className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+      <div className="rounded-xl bg-card p-5 shadow-sm ring-1 ring-border">
         <h2 className="mb-3 font-semibold">Identitas kategori</h2>
         <RubricForm action={updateCategoryInfoAction} submitLabel="Simpan" clearOnSuccess={false}>
           <input type="hidden" name="categoryId" value={category.id} />
           <Field label="Kode" name="code" defaultValue={category.code} required className="w-32" disabled={locked} />
           <Field label="Nama kategori" name="name" defaultValue={category.name} required />
         </RubricForm>
-        {locked && <p className="mt-2 text-xs text-slate-400">Kode terkunci karena sudah ada nilai.</p>}
+        {locked && <p className="mt-2 text-xs text-muted-foreground">Kode terkunci karena sudah ada nilai.</p>}
       </div>
 
       <div className="space-y-4">
         {category.groups.map((group, gi) => (
-          <section key={group.id} className="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
-            <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-2">
+          <section key={group.id} className="overflow-hidden rounded-xl bg-card shadow-sm ring-1 ring-border">
+            <div className="flex flex-wrap items-center gap-2 border-b border-border bg-muted px-4 py-2">
               <div className="flex-1">
                 <RubricForm
                   action={updateGroupAction}
@@ -89,21 +89,21 @@ export default async function EditCategoryPage({
                 >
                   <input type="hidden" name="groupId" value={group.id} />
                   <label className="space-y-1">
-                    <span className="block text-xs font-medium text-slate-500">Kode</span>
+                    <span className="block text-xs font-medium text-muted-foreground">Kode</span>
                     <input
                       name="code"
                       defaultValue={group.code ?? ''}
                       placeholder="A"
-                      className="w-20 rounded-lg border border-slate-300 px-2 py-1.5 text-sm outline-none focus:border-slate-900"
+                      className="w-20 rounded-lg border border-input px-2 py-1.5 text-sm outline-none focus:border-ring"
                     />
                   </label>
                   <label className="space-y-1">
-                    <span className="block text-xs font-medium text-slate-500">Nama grup</span>
+                    <span className="block text-xs font-medium text-muted-foreground">Nama grup</span>
                     <input
                       name="name"
                       defaultValue={group.name}
                       required
-                      className="w-72 rounded-lg border border-slate-300 px-2 py-1.5 text-sm outline-none focus:border-slate-900"
+                      className="w-72 rounded-lg border border-input px-2 py-1.5 text-sm outline-none focus:border-ring"
                     />
                   </label>
                 </RubricForm>
@@ -112,7 +112,7 @@ export default async function EditCategoryPage({
                 <form action={moveGroupAction}>
                   <input type="hidden" name="id" value={group.id} />
                   <input type="hidden" name="dir" value="up" />
-                  <button disabled={gi === 0} className="rounded px-2 py-1 text-slate-500 hover:bg-slate-200 disabled:opacity-30" title="Naik">
+                  <button disabled={gi === 0} className="rounded px-2 py-1 text-muted-foreground hover:bg-accent disabled:opacity-30" title="Naik">
                     ▲
                   </button>
                 </form>
@@ -121,7 +121,7 @@ export default async function EditCategoryPage({
                   <input type="hidden" name="dir" value="down" />
                   <button
                     disabled={gi === category.groups.length - 1}
-                    className="rounded px-2 py-1 text-slate-500 hover:bg-slate-200 disabled:opacity-30"
+                    className="rounded px-2 py-1 text-muted-foreground hover:bg-accent disabled:opacity-30"
                     title="Turun"
                   >
                     ▼
@@ -130,15 +130,15 @@ export default async function EditCategoryPage({
                 {!locked && (
                   <form action={deleteGroupAction}>
                     <input type="hidden" name="groupId" value={group.id} />
-                    <button className="rounded px-2 py-1 text-sm text-red-600 hover:bg-red-50">Hapus grup</button>
+                    <button className="rounded px-2 py-1 text-sm text-red-600 hover:bg-danger/10">Hapus grup</button>
                   </form>
                 )}
               </div>
             </div>
 
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-border">
               {group.criteria.length === 0 && (
-                <li className="px-4 py-3 text-sm text-slate-400">Belum ada butir pada grup ini.</li>
+                <li className="px-4 py-3 text-sm text-muted-foreground">Belum ada butir pada grup ini.</li>
               )}
               {group.criteria.map((criterion, ci) => (
                 <CriterionEditor
@@ -158,7 +158,7 @@ export default async function EditCategoryPage({
             </ul>
 
             {!locked && (
-              <div className="border-t border-slate-200 bg-slate-50/50 px-4 py-3">
+              <div className="border-t border-border bg-muted/40 px-4 py-3">
                 <RubricForm action={addCriterionAction} submitLabel="Tambah butir">
                   <input type="hidden" name="groupId" value={group.id} />
                   <Field label="Nama butir" name="name" required placeholder="Hadap Kiri Maju" />
@@ -178,7 +178,7 @@ export default async function EditCategoryPage({
       </div>
 
       {!locked && (
-        <div className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+        <div className="rounded-xl bg-card p-5 shadow-sm ring-1 ring-border">
           <h2 className="mb-3 font-semibold">Tambah grup baru</h2>
           <RubricForm action={addGroupAction} submitLabel="Tambah grup">
             <input type="hidden" name="categoryId" value={category.id} />

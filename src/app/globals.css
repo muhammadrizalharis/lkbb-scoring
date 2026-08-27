@@ -1,26 +1,97 @@
 @import "tailwindcss";
 
+/* Mode gelap dikontrol lewat kelas .dark pada <html> (bukan hanya prefers-color-scheme). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #eef2f8;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+  --input: #cbd5e1;
+  --ring: #2563eb;
+  --primary: #1e3a8a;
+  --primary-foreground: #f8fafc;
+  --accent: #e7eefb;
+  --accent-foreground: #14213d;
+  --success: #059669;
+  --warning: #d97706;
+  --danger: #dc2626;
+}
+
+.dark {
+  --background: #0a0f1c;
+  --foreground: #e6edf6;
+  --card: #101a2d;
+  --card-foreground: #e6edf6;
+  --muted: #172136;
+  --muted-foreground: #93a2ba;
+  --border: #223049;
+  --input: #33415a;
+  --ring: #3b82f6;
+  --primary: #3b82f6;
+  --primary-foreground: #eff6ff;
+  --accent: #1b2740;
+  --accent-foreground: #e6edf6;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #f87171;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
+  min-height: 100vh;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+  background-color: var(--background);
+  /* Cahaya lembut di sudut untuk kesan mewah namun tetap formal. */
+  background-image:
+    radial-gradient(60rem 30rem at 100% -10%, color-mix(in oklab, var(--primary) 14%, transparent), transparent),
+    radial-gradient(50rem 30rem at -10% 0%, color-mix(in oklab, var(--primary) 8%, transparent), transparent);
+  background-attachment: fixed;
+}
+
+/* Transisi halus saat berpindah tema. */
+body,
+.themed {
+  transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--primary) 30%, transparent);
+}
+
+/* Scrollbar yang menyatu dengan tema. */
+* {
+  scrollbar-color: color-mix(in oklab, var(--muted-foreground) 40%, transparent) transparent;
 }

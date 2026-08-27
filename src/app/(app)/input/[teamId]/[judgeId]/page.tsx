@@ -37,15 +37,15 @@ export default async function SheetPage({
 
   return (
     <div className="space-y-4">
-      <Link href="/input" className="text-sm text-slate-600 underline">
+      <Link href="/input" className="text-sm text-muted-foreground underline">
         ← Kembali ke daftar
       </Link>
 
-      <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+      <div className="rounded-xl bg-card p-4 shadow-sm ring-1 ring-border">
         <h1 className="text-xl font-bold">
-          <span className="text-slate-400 tabular-nums">{team.number}</span> {team.name}
+          <span className="text-muted-foreground tabular-nums">{team.number}</span> {team.name}
         </h1>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-muted-foreground">
           {judge.category.name} · Juri {judge.code} ({judge.name})
         </p>
       </div>

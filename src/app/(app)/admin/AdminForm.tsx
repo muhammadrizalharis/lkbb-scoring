@@ -24,7 +24,7 @@ export function AdminForm({
       <button
         type="submit"
         disabled={pending}
-        className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:opacity-50"
+        className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50"
       >
         {pending ? 'Menyimpan…' : submitLabel}
       </button>
@@ -41,7 +41,7 @@ export function Field({
       <span className="block text-sm font-medium">{label}</span>
       <input
         {...props}
-        className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-900"
+        className="rounded-lg border border-input px-3 py-2 text-sm outline-none focus:border-ring"
       />
     </label>
   )

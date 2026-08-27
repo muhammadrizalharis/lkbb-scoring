@@ -27,10 +27,10 @@ export default async function AdminPage() {
           <Link
             key={l.href}
             href={l.href}
-            className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200 transition hover:ring-slate-400"
+            className="rounded-xl bg-card p-5 shadow-sm ring-1 ring-border transition hover:ring-primary/40"
           >
             <h2 className="font-semibold">{l.title}</h2>
-            <p className="mt-1 text-sm text-slate-500">{l.desc}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{l.desc}</p>
           </Link>
         ))}
       </div>

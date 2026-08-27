@@ -23,7 +23,7 @@ export default async function AdminTeamPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Tim Peserta</h1>
 
-      <div className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+      <div className="rounded-xl bg-card p-5 shadow-sm ring-1 ring-border">
         <AdminForm action={addTeamAction} submitLabel="Tambah tim">
           <Field label="No. urut" name="number" type="number" min={1} defaultValue={nextNumber} required className="w-24" />
           <Field label="Nama tim" name="name" required placeholder="Contoh: Paskibra SMAN 1" />
@@ -31,9 +31,9 @@ export default async function AdminTeamPage() {
         </AdminForm>
       </div>
 
-      <div className="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+      <div className="overflow-hidden rounded-xl bg-card shadow-sm ring-1 ring-border">
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-left">
+          <thead className="bg-muted text-left">
             <tr>
               <th className="px-4 py-2 w-20">No</th>
               <th className="px-4 py-2">Nama tim</th>
@@ -41,10 +41,10 @@ export default async function AdminTeamPage() {
               <th className="px-4 py-2 w-28"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-border">
             {event.teams.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-slate-500">
+                <td colSpan={4} className="px-4 py-6 text-muted-foreground">
                   Belum ada tim.
                 </td>
               </tr>
@@ -53,7 +53,7 @@ export default async function AdminTeamPage() {
               <tr key={team.id}>
                 <td className="px-4 py-2 tabular-nums">{team.number}</td>
                 <td className="px-4 py-2 font-medium">{team.name}</td>
-                <td className="px-4 py-2 text-slate-500">{team.school ?? '–'}</td>
+                <td className="px-4 py-2 text-muted-foreground">{team.school ?? '–'}</td>
                 <td className="px-4 py-2 text-right">
                   {team._count.sheets === 0 ? (
                     <form action={deleteTeamAction}>
@@ -61,7 +61,7 @@ export default async function AdminTeamPage() {
                       <button className="text-sm text-red-600 hover:underline">Hapus</button>
                     </form>
                   ) : (
-                    <span className="text-xs text-slate-400">ada nilai</span>
+                    <span className="text-xs text-muted-foreground">ada nilai</span>
                   )}
                 </td>
               </tr>

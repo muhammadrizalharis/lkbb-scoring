@@ -33,14 +33,14 @@ export default async function RubricPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Format Penilaian (Rubrik)</h1>
-        <p className="max-w-2xl text-sm text-slate-500">
+        <p className="max-w-2xl text-sm text-muted-foreground">
           Susun sendiri kategori, grup, butir, dan pilihan nilainya. Perubahan langsung dipakai di
           halaman input dan rekap. Setelah sebuah kategori memiliki nilai tersimpan, strukturnya
           dikunci agar data lomba tidak rusak.
         </p>
       </div>
 
-      <div className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+      <div className="rounded-xl bg-card p-5 shadow-sm ring-1 ring-border">
         <h2 className="mb-3 font-semibold">Tambah kategori</h2>
         <RubricForm action={createCategoryAction} submitLabel="Tambah kategori">
           <Field label="Kode" name="code" required placeholder="PBB" className="w-32" />
@@ -50,7 +50,7 @@ export default async function RubricPage() {
 
       <div className="space-y-3">
         {categories.length === 0 && (
-          <p className="rounded-xl bg-white p-6 text-sm text-slate-500 shadow-sm ring-1 ring-slate-200">
+          <p className="rounded-xl bg-card p-6 text-sm text-muted-foreground shadow-sm ring-1 ring-border">
             Belum ada kategori. Tambahkan kategori pertama di atas.
           </p>
         )}
@@ -59,7 +59,7 @@ export default async function RubricPage() {
           return (
             <div
               key={category.id}
-              className="flex flex-wrap items-center gap-4 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200"
+              className="flex flex-wrap items-center gap-4 rounded-xl bg-card p-4 shadow-sm ring-1 ring-border"
             >
               <div className="flex flex-col">
                 <form action={moveCategoryAction}>
@@ -67,7 +67,7 @@ export default async function RubricPage() {
                   <input type="hidden" name="dir" value="up" />
                   <button
                     disabled={i === 0}
-                    className="rounded px-2 text-slate-500 transition hover:bg-slate-100 disabled:opacity-30"
+                    className="rounded px-2 text-muted-foreground transition hover:bg-accent disabled:opacity-30"
                     title="Naik"
                   >
                     ▲
@@ -78,7 +78,7 @@ export default async function RubricPage() {
                   <input type="hidden" name="dir" value="down" />
                   <button
                     disabled={i === categories.length - 1}
-                    className="rounded px-2 text-slate-500 transition hover:bg-slate-100 disabled:opacity-30"
+                    className="rounded px-2 text-muted-foreground transition hover:bg-accent disabled:opacity-30"
                     title="Turun"
                   >
                     ▼
@@ -88,12 +88,12 @@ export default async function RubricPage() {
 
               <div className="flex-1">
                 <p className="font-semibold">
-                  <span className="mr-2 rounded bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600">
+                  <span className="mr-2 rounded bg-muted px-2 py-0.5 text-xs font-bold text-muted-foreground">
                     {category.code}
                   </span>
                   {category.name}
                 </p>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-muted-foreground">
                   {category.groups.length} grup · {criteria} butir · rentang {category.minScore}–
                   {category.maxScore} · {category._count.judges} juri
                 </p>
@@ -102,14 +102,14 @@ export default async function RubricPage() {
               <div className="flex items-center gap-2">
                 <Link
                   href={`/admin/rubrik/${category.id}`}
-                  className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
                 >
                   Sunting
                 </Link>
                 {category._count.judges === 0 && (
                   <form action={deleteCategoryAction}>
                     <input type="hidden" name="categoryId" value={category.id} />
-                    <button className="rounded-lg border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50">
+                    <button className="rounded-lg border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-danger/10">
                       Hapus
                     </button>
                   </form>

@@ -21,7 +21,7 @@ export default async function AdminCategoryPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Bobot Kategori</h1>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-muted-foreground">
           Bobot 1 berarti nilai dipakai apa adanya. Ubah bila Juara Umum memakai persentase tertentu.
         </p>
       </div>
@@ -30,9 +30,9 @@ export default async function AdminCategoryPage() {
         {event.categories.map((category) => {
           const criteria = category.groups.reduce((n, g) => n + g.criteria.length, 0)
           return (
-            <div key={category.id} className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+            <div key={category.id} className="rounded-xl bg-card p-5 shadow-sm ring-1 ring-border">
               <h2 className="font-semibold">{category.name}</h2>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 {criteria} butir · rentang {category.minScore}–{category.maxScore} · {category._count.judges} juri
               </p>
 
