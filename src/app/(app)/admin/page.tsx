@@ -13,6 +13,11 @@ const SUPER_LINKS = [
     title: 'Format Penilaian (Rubrik)',
     desc: 'Susun sendiri kategori, grup, butir, dan pilihan nilai. Khusus Super Admin.',
   },
+  {
+    href: '/admin/reset',
+    title: 'Reset Data Lomba',
+    desc: 'Kosongkan data demo/lama (tim, juri, nilai) untuk mulai event baru. Rubrik tetap aman.',
+  },
 ]
 
 export default async function AdminPage() {

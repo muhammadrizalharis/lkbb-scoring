@@ -6,7 +6,7 @@ import { prisma } from '@/lib/db'
 import { requireMinRole } from '@/lib/auth'
 import { EVENT_SLUG } from '@/lib/config'
 
-export type AdminState = { ok?: boolean; error?: string }
+export type AdminState = { ok?: boolean; error?: string; message?: string }
 
 async function currentEvent() {
   const event = await prisma.event.findUnique({ where: { slug: EVENT_SLUG } })
@@ -153,3 +153,53 @@ export async function updateCategoryAction(_prev: AdminState, formData: FormData
   revalidatePath('/rekap')
   return { ok: true }
 }
+
+/**
+ * Menghapus SELURUH data lomba (tim, juri, nilai, penalti) untuk memulai event baru.
+ * Rubrik dan akun pengguna DIPERTAHANKAN. Khusus Super Admin, butuh ketik konfirmasi.
+ */
+export async function resetEventDataAction(_prev: AdminState, formData: FormData): Promise<AdminState> {
+  let session
+  try {
+    session = await requireMinRole('SUPER_ADMIN')
+  } catch {
+    return { error: 'Hanya Super Admin yang boleh mereset data lomba.' }
+  }
+
+  if (String(formData.get('confirm') ?? '').trim().toUpperCase() !== 'HAPUS') {
+    return { error: 'Ketik HAPUS untuk mengonfirmasi.' }
+  }
+
+  const event = await currentEvent()
+
+  const summary = await prisma.$transaction(async (tx) => {
+    const teams = await tx.team.count({ where: { eventId: event.id } })
+    const judges = await tx.judge.count({ where: { eventId: event.id } })
+    const sheets = await tx.scoreSheet.count({ where: { eventId: event.id } })
+    // Urutan tak wajib karena relasi ber-cascade, tapi eksplisit agar jelas.
+    await tx.penalty.deleteMany({ where: { eventId: event.id } })
+    await tx.scoreSheet.deleteMany({ where: { eventId: event.id } })
+    await tx.judge.deleteMany({ where: { eventId: event.id } })
+    await tx.team.deleteMany({ where: { eventId: event.id } })
+    await tx.event.update({ where: { id: event.id }, data: { recapOpen: false } })
+    await tx.auditLog.create({
+      data: {
+        userId: session.userId,
+        action: 'RESET_EVENT_DATA',
+        entity: 'Event',
+        entityId: event.id,
+        detail: { teams, judges, sheets },
+      },
+    })
+    return { teams, judges, sheets }
+  })
+
+  revalidatePath('/')
+  revalidatePath('/input')
+  revalidatePath('/rekap')
+  revalidatePath('/admin/tim')
+  revalidatePath('/admin/juri')
+
+  return { ok: true, message: `Terhapus: ${summary.teams} tim, ${summary.judges} juri, ${summary.sheets} lembar nilai.` }
+}
+

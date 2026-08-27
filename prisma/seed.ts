@@ -77,6 +77,77 @@ async function seedRubric() {
   return event
 }
 
+/**
+ * Data contoh untuk demonstrasi UI (mis. di Vercel). Hanya jalan bila SEED_DEMO=1
+ * dan belum ada satu tim pun, sehingga tidak menimpa data sungguhan saat redeploy.
+ */
+async function seedDemo(eventId: string) {
+  const existing = await prisma.team.count({ where: { eventId } })
+  if (existing > 0) {
+    console.log(`  · demo dilewati: sudah ada ${existing} tim.`)
+    return
+  }
+
+  const teams = [
+    'Paskibra SMAN 1 Tinambung',
+    'Paskibra SMAN 2 Polewali',
+    'Paskibra SMAN 3 Majene',
+    'Paskibra SMKN 1 Wonomulyo',
+    'Paskibra MAN 1 Mamuju',
+  ]
+  for (const [i, name] of teams.entries()) {
+    await prisma.team.create({ data: { eventId, number: i + 1, name } })
+  }
+
+  const categories = await prisma.category.findMany({
+    where: { eventId },
+    include: { groups: { include: { criteria: true } } },
+  })
+
+  // Dua juri untuk PBB agar penjumlahan antar juri ikut terlihat di demo.
+  for (const category of categories) {
+    const judgeNums = category.code === 'PBB' ? [1, 2] : [1]
+    for (const n of judgeNums) {
+      await prisma.judge.create({
+        data: { eventId, categoryId: category.id, code: `${category.code}-${n}`, name: `Juri ${category.code}-${n}` },
+      })
+    }
+  }
+
+  const allTeams = await prisma.team.findMany({ where: { eventId } })
+  const judges = await prisma.judge.findMany({ where: { eventId } })
+  const criteriaByCategory = new Map(
+    categories.map((c) => [c.id, c.groups.flatMap((g) => g.criteria)]),
+  )
+
+  let sheets = 0
+  for (const team of allTeams) {
+    for (const judge of judges) {
+      const criteria = criteriaByCategory.get(judge.categoryId) ?? []
+      const items = criteria.map((c) => ({
+        criterionId: c.id,
+        value: c.options[Math.floor(Math.random() * c.options.length)],
+      }))
+      const total = items.reduce((s, it) => s + it.value, 0)
+      await prisma.scoreSheet.create({
+        data: {
+          eventId,
+          teamId: team.id,
+          judgeId: judge.id,
+          categoryId: judge.categoryId,
+          total,
+          status: 'FINAL',
+          finalizedAt: new Date(),
+          items: { create: items },
+        },
+      })
+      sheets += 1
+    }
+  }
+
+  console.log(`  ✓ demo: ${allTeams.length} tim · ${judges.length} juri · ${sheets} lembar nilai`)
+}
+
 async function main() {
   console.log(`Seeding "${EVENT_NAME}" (${EVENT_SLUG})`)
   await seedAdmin()
@@ -86,6 +157,8 @@ async function main() {
   const totalMin = cats.reduce((n, c) => n + c.minScore, 0)
   const totalMax = cats.reduce((n, c) => n + c.maxScore, 0)
   console.log(`  Σ total per juri lengkap: ${totalMin}–${totalMax}`)
+
+  if (process.env.SEED_DEMO === '1') await seedDemo(event.id)
 }
 
 main()

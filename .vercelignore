@@ -1,0 +1,10 @@
+.env
+.env.*
+.git
+.github
+.next
+node_modules
+tests
+*.log
+/src/generated
+scripts/demo-data.ts
