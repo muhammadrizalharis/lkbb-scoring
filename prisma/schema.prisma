@@ -38,6 +38,15 @@ model Event {
   isActive  Boolean  @default(true)
   /// Sembunyikan rekap dari layar publik sampai semua tim selesai tampil.
   recapOpen Boolean  @default(false)
+  /// Bila true, rubrik dikunci (lomba sudah dipublish). Diatur super admin.
+  published Boolean  @default(false)
+  /// Metode Juara Umum: "MEDAL_POINTS" (poin emas/perak/perunggu) atau "TOTAL_SCORE".
+  overallMethod String @default("MEDAL_POINTS")
+  goldPoints    Int    @default(3)
+  silverPoints  Int    @default(2)
+  bronzePoints  Int    @default(1)
+  /// Berapa peringkat teratas per kategori yang mendapat medali.
+  medalPlaces   Int    @default(3)
   createdAt DateTime @default(now())
 
   categories Category[]

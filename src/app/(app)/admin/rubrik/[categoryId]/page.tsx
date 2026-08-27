@@ -41,8 +41,7 @@ export default async function EditCategoryPage({
   })
   if (!category) notFound()
 
-  const scoredCount = await prisma.scoreItem.count({ where: { sheet: { categoryId: category.id } } })
-  const locked = scoredCount > 0
+  const locked = event.published
   const criteriaTotal = category.groups.reduce((n, g) => n + g.criteria.length, 0)
 
   return (
@@ -60,9 +59,9 @@ export default async function EditCategoryPage({
 
       {locked && (
         <div className="rounded-xl bg-warning/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-200 ring-1 ring-warning/30">
-          Kategori ini sudah memiliki nilai tersimpan, jadi <b>struktur terkunci</b>. Nama masih boleh
-          diubah, tetapi menambah/menghapus butir dan mengubah pilihan nilai dinonaktifkan agar nilai
-          yang sudah masuk tidak menjadi tidak sah.
+          Lomba sudah <b>dipublish</b>, jadi <b>rubrik terkunci</b>. Nama masih boleh diubah, tetapi
+          menambah/menghapus butir dan mengubah pilihan nilai dinonaktifkan. Buka kunci lewat tombol
+          “Batalkan publish” di halaman daftar rubrik.
         </div>
       )}
 
@@ -73,7 +72,7 @@ export default async function EditCategoryPage({
           <Field label="Kode" name="code" defaultValue={category.code} required className="w-32" disabled={locked} />
           <Field label="Nama kategori" name="name" defaultValue={category.name} required />
         </RubricForm>
-        {locked && <p className="mt-2 text-xs text-muted-foreground">Kode terkunci karena sudah ada nilai.</p>}
+        {locked && <p className="mt-2 text-xs text-muted-foreground">Kode terkunci karena lomba sudah dipublish.</p>}
       </div>
 
       <div className="space-y-4">

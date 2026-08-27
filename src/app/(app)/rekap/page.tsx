@@ -1,41 +1,48 @@
 import { EVENT_SLUG } from '@/lib/config'
-import { getStandings, categoryWinners } from '@/lib/scoring'
+import { getRekap, categoryRanking, type Medal, type RekapTeam } from '@/lib/scoring'
 
 export const dynamic = 'force-dynamic'
 
-const MEDALS = [
-  'bg-gradient-to-br from-amber-300 to-amber-500 text-amber-950 ring-2 ring-amber-300/60 shadow',
-  'bg-gradient-to-br from-slate-200 to-slate-400 text-slate-900 ring-2 ring-slate-300/60 shadow',
-  'bg-gradient-to-br from-orange-300 to-orange-500 text-orange-950 ring-2 ring-orange-300/60 shadow',
-]
+const MEDAL_BADGE: Record<Exclude<Medal, null>, string> = {
+  gold: 'bg-gradient-to-br from-amber-300 to-amber-500 text-amber-950',
+  silver: 'bg-gradient-to-br from-slate-200 to-slate-400 text-slate-900',
+  bronze: 'bg-gradient-to-br from-orange-300 to-orange-500 text-orange-950',
+}
+const MEDAL_EMOJI: Record<Exclude<Medal, null>, string> = { gold: '🥇', silver: '🥈', bronze: '🥉' }
+const RANK_MEDALS = ['gold', 'silver', 'bronze'] as const
 
 const PODIUM = [
-  { label: 'Juara 1', ring: 'ring-amber-400/50', glow: 'from-amber-400/20' },
-  { label: 'Juara 2', ring: 'ring-slate-400/50', glow: 'from-slate-400/20' },
-  { label: 'Juara 3', ring: 'ring-orange-400/50', glow: 'from-orange-400/20' },
+  { label: 'Juara Umum 1', ring: 'ring-amber-400/50', glow: 'from-amber-400/20' },
+  { label: 'Juara Umum 2', ring: 'ring-slate-400/50', glow: 'from-slate-400/20' },
+  { label: 'Juara Umum 3', ring: 'ring-orange-400/50', glow: 'from-orange-400/20' },
 ]
 
 export default async function RekapPage() {
-  const data = await getStandings(EVENT_SLUG)
+  const data = await getRekap(EVENT_SLUG)
   if (!data) return <p>Event tidak ditemukan.</p>
 
-  const { event, standings } = data
-  const categories = event.categories
+  const { event, teams, method } = data
+  const categories = event.categories.filter((c) => c.includeInOverall)
+  const isMedal = method === 'MEDAL_POINTS'
 
-  if (standings.length === 0) {
+  if (teams.length === 0) {
     return <p className="rounded-xl bg-card p-6 shadow-sm">Belum ada tim peserta.</p>
   }
 
-  const anyTie = standings.some((s) => s.tied)
-  const incomplete = standings.filter((s) => !s.complete).length
+  const anyTie = teams.some((t) => t.overallTied)
+  const incomplete = teams.filter((t) => !t.complete).length
+  const metric = (t: RekapTeam) => (isMedal ? t.medalPoints : t.totalScore)
+  const metricUnit = isMedal ? 'poin' : ''
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Rekapitulasi &amp; Peringkat</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Rekapitulasi &amp; Juara Umum</h1>
           <p className="text-sm text-muted-foreground">
-            Nilai antar juri dijumlahkan. Total = jumlah kategori berbobot dikurangi penalti.
+            {isMedal
+              ? `Tiap kategori memberi medali (emas ${event.goldPoints} poin · perak ${event.silverPoints} · perunggu ${event.bronzePoints}). Juara Umum = poin terbanyak.`
+              : 'Juara Umum = akumulasi nilai semua kategori (× bobot) dikurangi penalti.'}
           </p>
         </div>
         <a
@@ -53,31 +60,31 @@ export default async function RekapPage() {
       )}
       {anyTie && (
         <p className="rounded-xl bg-danger/10 px-4 py-3 text-sm text-red-700 dark:text-red-300 ring-1 ring-danger/30">
-          Ada tim dengan total identik (ditandai <b>SERI</b>). Sesuai aturan, pemenang ditentukan oleh
-          keputusan juri.
+          Ada tim yang identik di semua kriteria (ditandai <b>SERI</b>). Pemenang ditentukan keputusan juri.
         </p>
       )}
 
       <section className="grid gap-4 sm:grid-cols-3">
-        {standings.slice(0, 3).map((s, i) => (
+        {teams.slice(0, 3).map((t, i) => (
           <div
-            key={s.teamId}
+            key={t.teamId}
             className={`relative overflow-hidden rounded-2xl bg-card p-5 shadow-sm ring-1 ${PODIUM[i].ring}`}
           >
             <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${PODIUM[i].glow} to-transparent`} />
-            <div className="relative flex items-center gap-4">
-              <span
-                className={`grid size-12 shrink-0 place-items-center rounded-xl text-lg font-black tabular-nums ${MEDALS[i]}`}
-              >
-                {s.rank}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                  {PODIUM[i].label}
+            <div className="relative">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                {PODIUM[i].label}
+              </p>
+              <p className="mt-0.5 truncate text-lg font-bold">{t.name}</p>
+              <p className="mt-1 text-3xl font-black tabular-nums">
+                {metric(t)}
+                {metricUnit && <span className="ml-1 text-sm font-normal text-muted-foreground">{metricUnit}</span>}
+              </p>
+              {isMedal && (
+                <p className="mt-1 text-sm tabular-nums">
+                  🥇 {t.gold} · 🥈 {t.silver} · 🥉 {t.bronze}
                 </p>
-                <p className="truncate font-bold">{s.name}</p>
-                <p className="text-2xl font-black tabular-nums">{s.total}</p>
-              </div>
+              )}
             </div>
           </div>
         ))}
@@ -90,56 +97,53 @@ export default async function RekapPage() {
               <th className="px-3 py-2">#</th>
               <th className="px-3 py-2">Tim</th>
               {categories.map((c) => (
-                <th key={c.id} className="px-3 py-2 text-right whitespace-nowrap">
+                <th key={c.id} className="px-3 py-2 text-center whitespace-nowrap">
                   {c.code}
-                  {c.weight !== 1 && <span className="text-xs text-muted-foreground"> ×{c.weight}</span>}
-                  {!c.includeInOverall && <span className="text-xs text-muted-foreground"> (luar)</span>}
                 </th>
               ))}
-              <th className="px-3 py-2 text-right">Penalti</th>
-              <th className="px-3 py-2 text-right">Total</th>
+              {isMedal && <th className="px-3 py-2 text-center whitespace-nowrap">🥇🥈🥉</th>}
+              <th className="px-3 py-2 text-right">{isMedal ? 'Poin' : 'Total'}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {standings.map((s) => (
-              <tr
-                key={s.teamId}
-                className={`transition hover:bg-accent/40 ${s.tied ? 'bg-danger/10' : ''}`}
-              >
+            {teams.map((t) => (
+              <tr key={t.teamId} className={`transition hover:bg-accent/40 ${t.overallTied ? 'bg-danger/10' : ''}`}>
                 <td className="px-3 py-2">
                   <span
-                    className={`inline-flex h-7 w-7 items-center justify-center rounded-full font-bold tabular-nums ${
-                      MEDALS[s.rank - 1] ?? 'text-muted-foreground'
+                    className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold tabular-nums ${
+                      t.overallRank <= 3 ? MEDAL_BADGE[RANK_MEDALS[t.overallRank - 1]] : 'text-muted-foreground'
                     }`}
                   >
-                    {s.rank}
+                    {t.overallRank}
                   </span>
                 </td>
                 <td className="px-3 py-2">
-                  <span className="mr-2 text-muted-foreground tabular-nums">{s.number}</span>
-                  <span className="font-medium">{s.name}</span>
-                  {s.tied && (
+                  <span className="mr-2 text-muted-foreground tabular-nums">{t.number}</span>
+                  <span className="font-medium">{t.name}</span>
+                  {t.overallTied && (
                     <span className="ml-2 rounded bg-danger/20 px-1.5 py-0.5 text-xs font-bold text-red-700 dark:text-red-300">
                       SERI
                     </span>
                   )}
-                  {!s.complete && <span className="ml-2 text-xs text-amber-600">belum lengkap</span>}
+                  {!t.complete && <span className="ml-2 text-xs text-amber-600">belum lengkap</span>}
                 </td>
                 {categories.map((c) => {
-                  const cell = s.categories.find((x) => x.categoryId === c.id)
+                  const cell = t.categories.find((x) => x.categoryId === c.id)
                   return (
-                    <td key={c.id} className="px-3 py-2 text-right tabular-nums">
-                      {cell?.raw ?? 0}
-                      <span className="ml-1 text-xs text-muted-foreground">
-                        {cell?.sheetsFinal ?? 0}/{cell?.sheetsExpected ?? 0}
-                      </span>
+                    <td key={c.id} className="px-3 py-2 text-center tabular-nums">
+                      <div className="flex flex-col items-center leading-tight">
+                        <span>{cell?.raw ?? 0}</span>
+                        {cell?.medal && <span title={cell.medal}>{MEDAL_EMOJI[cell.medal]}</span>}
+                      </div>
                     </td>
                   )
                 })}
-                <td className="px-3 py-2 text-right tabular-nums text-red-600">
-                  {s.penalty > 0 ? `−${s.penalty}` : '–'}
-                </td>
-                <td className="px-3 py-2 text-right text-lg font-black tabular-nums">{s.total}</td>
+                {isMedal && (
+                  <td className="px-3 py-2 text-center tabular-nums whitespace-nowrap">
+                    {t.gold}/{t.silver}/{t.bronze}
+                  </td>
+                )}
+                <td className="px-3 py-2 text-right text-lg font-black tabular-nums">{metric(t)}</td>
               </tr>
             ))}
           </tbody>
@@ -147,19 +151,24 @@ export default async function RekapPage() {
       </div>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {categories.map((c) => {
-          const winners = categoryWinners(standings, c.code).slice(0, 3)
+        {event.categories.map((c) => {
+          const winners = categoryRanking(teams, c.id).slice(0, 3)
           return (
             <div key={c.id} className="rounded-xl bg-card p-4 shadow-sm ring-1 ring-border">
-              <h3 className="font-semibold">Terbaik · {c.name}</h3>
+              <h3 className="font-semibold">
+                {c.name}
+                {!c.includeInOverall && (
+                  <span className="ml-2 text-xs font-normal text-muted-foreground">(di luar Juara Umum)</span>
+                )}
+              </h3>
               <ol className="mt-2 space-y-1 text-sm">
                 {winners.map((w, i) => (
-                  <li key={w.team.teamId} className="flex justify-between gap-2">
-                    <span className="truncate">
-                      <span className="mr-1.5 text-muted-foreground">{i + 1}.</span>
+                  <li key={w.team.teamId} className="flex items-center justify-between gap-2">
+                    <span className="flex-1 truncate">
+                      <span className="mr-1.5">{['🥇', '🥈', '🥉'][i]}</span>
                       {w.team.name}
                     </span>
-                    <span className="font-semibold tabular-nums">{w.value}</span>
+                    <span className="font-semibold tabular-nums">{w.cat.raw}</span>
                   </li>
                 ))}
               </ol>

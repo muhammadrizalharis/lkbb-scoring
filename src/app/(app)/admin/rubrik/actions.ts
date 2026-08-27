@@ -15,10 +15,10 @@ async function currentEvent() {
   return event
 }
 
-/** Benar bila kategori sudah punya nilai tersimpan; ubah struktur diblokir agar data aman. */
-async function categoryHasScores(categoryId: string) {
-  const count = await prisma.scoreItem.count({ where: { sheet: { categoryId } } })
-  return count > 0
+/** Rubrik terkunci saat lomba sudah dipublish (diatur super admin). */
+async function eventLocked() {
+  const event = await prisma.event.findUnique({ where: { slug: EVENT_SLUG }, select: { published: true } })
+  return event?.published ?? false
 }
 
 /** Hitung ulang rentang min/maks kategori dari seluruh opsi butir di dalamnya. */
@@ -141,8 +141,8 @@ export async function updateCategoryInfoAction(_prev: RubricState, formData: For
 
   const code = parsed.data.code.toUpperCase()
   if (code !== category.code) {
-    if (await categoryHasScores(category.id)) {
-      return { error: 'Kode tidak bisa diubah karena kategori ini sudah memiliki nilai.' }
+    if (await eventLocked()) {
+      return { error: 'Kode tidak bisa diubah karena lomba sudah dipublish.' }
     }
     const clash = await prisma.category.findUnique({
       where: { eventId_code: { eventId: event.id, code } },
@@ -164,7 +164,7 @@ export async function deleteCategoryAction(formData: FormData) {
   await requireMinRole('SUPER_ADMIN')
   const id = String(formData.get('categoryId') ?? '')
   if (!id) return
-  if (await categoryHasScores(id)) return
+  if (await eventLocked()) return
   // Blokir bila masih ada juri yang ditugaskan ke kategori ini.
   const judges = await prisma.judge.count({ where: { categoryId: id } })
   if (judges > 0) return
@@ -194,8 +194,8 @@ export async function addGroupAction(_prev: RubricState, formData: FormData): Pr
   })
   if (!parsed.success) return { error: 'Nama grup wajib diisi.' }
 
-  if (await categoryHasScores(parsed.data.categoryId)) {
-    return { error: 'Struktur tidak bisa diubah karena kategori sudah memiliki nilai.' }
+  if (await eventLocked()) {
+    return { error: 'Struktur tidak bisa diubah karena lomba sudah dipublish.' }
   }
 
   const last = await prisma.criterionGroup.findFirst({
@@ -251,7 +251,7 @@ export async function deleteGroupAction(formData: FormData) {
   if (!id) return
   const group = await prisma.criterionGroup.findUnique({ where: { id } })
   if (!group) return
-  if (await categoryHasScores(group.categoryId)) return
+  if (await eventLocked()) return
   await prisma.$transaction(async (tx) => {
     await tx.criterionGroup.delete({ where: { id } })
     await recomputeCategory(tx, group.categoryId)
@@ -286,8 +286,8 @@ export async function addCriterionAction(_prev: RubricState, formData: FormData)
 
   const group = await prisma.criterionGroup.findUnique({ where: { id: parsed.data.groupId } })
   if (!group) return { error: 'Grup tidak dikenal.' }
-  if (await categoryHasScores(group.categoryId)) {
-    return { error: 'Struktur tidak bisa diubah karena kategori sudah memiliki nilai.' }
+  if (await eventLocked()) {
+    return { error: 'Struktur tidak bisa diubah karena lomba sudah dipublish.' }
   }
 
   const last = await prisma.criterion.findFirst({
@@ -340,12 +340,12 @@ export async function updateCriterionAction(_prev: RubricState, formData: FormDa
   })
   if (!criterion) return { error: 'Butir tidak dikenal.' }
 
-  const locked = await categoryHasScores(criterion.group.categoryId)
+  const locked = await eventLocked()
   const sameOptions =
     values.length === criterion.options.length && values.every((v, i) => v === criterion.options[i])
-  // Saat sudah ada nilai, hanya penggantian nama yang aman; opsi tidak boleh berubah.
+  // Saat lomba sudah dipublish, hanya penggantian nama yang boleh; opsi tidak boleh berubah.
   if (locked && !sameOptions) {
-    return { error: 'Pilihan nilai tidak bisa diubah karena kategori sudah memiliki nilai.' }
+    return { error: 'Pilihan nilai tidak bisa diubah karena lomba sudah dipublish.' }
   }
 
   await prisma.$transaction(async (tx) => {
@@ -369,7 +369,7 @@ export async function deleteCriterionAction(formData: FormData) {
     include: { group: true },
   })
   if (!criterion) return
-  if (await categoryHasScores(criterion.group.categoryId)) return
+  if (await eventLocked()) return
   await prisma.$transaction(async (tx) => {
     await tx.criterion.delete({ where: { id } })
     await recomputeCategory(tx, criterion.group.categoryId)
@@ -454,4 +454,13 @@ export async function moveGroupAction(formData: FormData) {
 
 export async function moveCriterionAction(formData: FormData) {
   await swapOrder('criterion', String(formData.get('id') ?? ''), formData.get('dir') === 'up' ? 'up' : 'down')
+}
+
+/** Publish/unpublish lomba: mengunci/membuka rubrik. Khusus super admin. */
+export async function setPublishedAction(formData: FormData) {
+  await requireMinRole('SUPER_ADMIN')
+  const published = formData.get('published') === '1'
+  await prisma.event.update({ where: { slug: EVENT_SLUG }, data: { published } })
+  revalidatePath('/admin/rubrik')
+  revalidatePath('/admin')
 }

@@ -202,3 +202,37 @@ export async function resetEventDataAction(_prev: AdminState, formData: FormData
 
   return { ok: true, message: `Terhapus: ${summary.teams} tim, ${summary.judges} juri, ${summary.sheets} lembar nilai.` }
 }
+
+const overallSchema = z.object({
+  overallMethod: z.enum(['MEDAL_POINTS', 'TOTAL_SCORE']),
+  goldPoints: z.coerce.number().int().min(0).max(1000),
+  silverPoints: z.coerce.number().int().min(0).max(1000),
+  bronzePoints: z.coerce.number().int().min(0).max(1000),
+  medalPlaces: z.coerce.number().int().min(1).max(3),
+})
+
+/** Konfigurasi metode & poin Juara Umum. Khusus Super Admin. */
+export async function updateOverallConfigAction(_prev: AdminState, formData: FormData): Promise<AdminState> {
+  try {
+    await requireMinRole('SUPER_ADMIN')
+  } catch {
+    return { error: 'Hanya Super Admin yang boleh mengatur Juara Umum.' }
+  }
+
+  const parsed = overallSchema.safeParse({
+    overallMethod: formData.get('overallMethod'),
+    goldPoints: formData.get('goldPoints'),
+    silverPoints: formData.get('silverPoints'),
+    bronzePoints: formData.get('bronzePoints'),
+    medalPlaces: formData.get('medalPlaces'),
+  })
+  if (!parsed.success) return { error: 'Konfigurasi tidak valid (poin 0–1000, medali 1–3).' }
+
+  const event = await currentEvent()
+  await prisma.event.update({ where: { id: event.id }, data: parsed.data })
+
+  revalidatePath('/admin/juara-umum')
+  revalidatePath('/rekap')
+  revalidatePath('/')
+  return { ok: true, message: 'Pengaturan Juara Umum tersimpan.' }
+}

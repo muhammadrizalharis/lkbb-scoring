@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db'
 import { getSession, hasAtLeast } from '@/lib/auth'
 import { EVENT_SLUG } from '@/lib/config'
 import { RubricForm, Field } from './RubricForm'
-import { createCategoryAction, deleteCategoryAction, moveCategoryAction } from './actions'
+import { createCategoryAction, deleteCategoryAction, moveCategoryAction, setPublishedAction } from './actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,6 +28,7 @@ export default async function RubricPage() {
   if (!event) return <p>Event tidak ditemukan.</p>
 
   const categories = event.categories
+  const published = event.published
 
   return (
     <div className="space-y-6">
@@ -35,17 +36,61 @@ export default async function RubricPage() {
         <h1 className="text-2xl font-bold">Format Penilaian (Rubrik)</h1>
         <p className="max-w-2xl text-sm text-muted-foreground">
           Susun sendiri kategori, grup, butir, dan pilihan nilainya. Perubahan langsung dipakai di
-          halaman input dan rekap. Setelah sebuah kategori memiliki nilai tersimpan, strukturnya
-          dikunci agar data lomba tidak rusak.
+          halaman input dan rekap. Saat siap, <b>publish</b> untuk mengunci rubrik selama lomba.
         </p>
       </div>
 
-      <div className="rounded-xl bg-card p-5 shadow-sm ring-1 ring-border">
+      {/* Status publish + toggle */}
+      <div
+        className={`flex flex-wrap items-center justify-between gap-3 rounded-2xl p-4 shadow-sm ring-1 ${
+          published ? 'bg-emerald-500/10 ring-emerald-500/30' : 'bg-card ring-border'
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          <span
+            className={`grid size-10 place-items-center rounded-xl ${
+              published ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300' : 'bg-muted text-muted-foreground'
+            }`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-5">
+              {published ? <path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5z" /> : <path d="M7 11V7a5 5 0 0 1 9.9-1M6 11h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z" />}
+            </svg>
+          </span>
+          <div>
+            <p className="font-semibold">
+              {published ? 'Lomba sudah dipublish — rubrik terkunci' : 'Mode setup — rubrik bisa diedit'}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {published
+                ? 'Struktur penilaian dikunci agar tidak berubah saat penjurian.'
+                : 'Selesaikan rubrik, lalu publish untuk mengunci sebelum lomba dimulai.'}
+            </p>
+          </div>
+        </div>
+        <form action={setPublishedAction}>
+          <input type="hidden" name="published" value={published ? '0' : '1'} />
+          <button
+            className={`rounded-xl px-5 py-2.5 font-semibold text-white shadow-lg transition hover:opacity-95 ${
+              published
+                ? 'bg-gradient-to-br from-amber-500 to-orange-600 shadow-orange-600/25'
+                : 'bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-emerald-600/25'
+            }`}
+          >
+            {published ? 'Batalkan publish' : 'Publish untuk lomba'}
+          </button>
+        </form>
+      </div>
+
+      <div className={`rounded-xl bg-card p-5 shadow-sm ring-1 ring-border ${published ? 'opacity-60' : ''}`}>
         <h2 className="mb-3 font-semibold">Tambah kategori</h2>
-        <RubricForm action={createCategoryAction} submitLabel="Tambah kategori">
-          <Field label="Kode" name="code" required placeholder="PBB" className="w-32" />
-          <Field label="Nama kategori" name="name" required placeholder="PBB Gerakan Dasar" />
-        </RubricForm>
+        {published ? (
+          <p className="text-sm text-muted-foreground">Batalkan publish dulu untuk menambah kategori.</p>
+        ) : (
+          <RubricForm action={createCategoryAction} submitLabel="Tambah kategori">
+            <Field label="Kode" name="code" required placeholder="PBB" className="w-32" />
+            <Field label="Nama kategori" name="name" required placeholder="PBB Gerakan Dasar" />
+          </RubricForm>
+        )}
       </div>
 
       <div className="space-y-3">
