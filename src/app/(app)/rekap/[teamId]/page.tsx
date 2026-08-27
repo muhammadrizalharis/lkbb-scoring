@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Fragment } from 'react'
 import { notFound } from 'next/navigation'
+import { getSession, hasAtLeast } from '@/lib/auth'
 import { EVENT_SLUG } from '@/lib/config'
 import { getTeamDetail } from '@/lib/scoring'
 import { PrintButton } from '../PrintButton'
@@ -13,6 +14,8 @@ export default async function TeamDetailPage({
   params: Promise<{ teamId: string }>
 }) {
   const { teamId } = await params
+  const session = await getSession()
+  const isSuperAdmin = !!session && hasAtLeast(session.role, 'SUPER_ADMIN')
   const data = await getTeamDetail(EVENT_SLUG, teamId)
   if (!data) notFound()
 
@@ -25,7 +28,7 @@ export default async function TeamDetailPage({
         <Link href="/rekap" className="text-sm text-muted-foreground underline">
           ← Kembali ke Rekapitulasi
         </Link>
-        <PrintButton />
+        {isSuperAdmin && <PrintButton />}
       </div>
 
       <div className="rounded-2xl bg-card p-5 shadow-sm ring-1 ring-border">

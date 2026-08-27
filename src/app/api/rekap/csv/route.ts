@@ -1,4 +1,4 @@
-import { getSession } from '@/lib/auth'
+import { getSession, hasAtLeast } from '@/lib/auth'
 import { EVENT_SLUG } from '@/lib/config'
 import { getRekap } from '@/lib/scoring'
 
@@ -13,7 +13,7 @@ function cell(value: string | number) {
 
 export async function GET() {
   const session = await getSession()
-  if (!session) return new Response('Unauthorized', { status: 401 })
+  if (!session || !hasAtLeast(session.role, 'SUPER_ADMIN')) return new Response('Unauthorized', { status: 401 })
 
   const data = await getRekap(EVENT_SLUG)
   if (!data) return new Response('Not found', { status: 404 })

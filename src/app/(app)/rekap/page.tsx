@@ -1,6 +1,8 @@
 import Link from 'next/link'
+import { getSession, hasAtLeast } from '@/lib/auth'
 import { EVENT_SLUG } from '@/lib/config'
 import { getRekap, categoryRanking, type Medal, type RekapTeam } from '@/lib/scoring'
+import { PrintButton } from './PrintButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,6 +21,8 @@ const PODIUM = [
 ]
 
 export default async function RekapPage() {
+  const session = await getSession()
+  const isSuperAdmin = !!session && hasAtLeast(session.role, 'SUPER_ADMIN')
   const data = await getRekap(EVENT_SLUG)
   if (!data) return <p>Event tidak ditemukan.</p>
 
@@ -49,7 +53,7 @@ export default async function RekapPage() {
             Klik nama tim untuk melihat rincian nilai per butir (per gerakan).
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 print:hidden">
           <a
             href="/live"
             target="_blank"
@@ -58,12 +62,15 @@ export default async function RekapPage() {
           >
             Tampilan Publik ↗
           </a>
-          <a
-            href="/api/rekap/csv"
-            className="rounded-lg border border-input bg-card px-4 py-2 text-sm font-semibold transition hover:bg-accent"
-          >
-            Unduh CSV
-          </a>
+          {isSuperAdmin && <PrintButton />}
+          {isSuperAdmin && (
+            <a
+              href="/api/rekap/csv"
+              className="rounded-lg border border-input bg-card px-4 py-2 text-sm font-semibold transition hover:bg-accent"
+            >
+              Unduh CSV
+            </a>
+          )}
         </div>
       </div>
 

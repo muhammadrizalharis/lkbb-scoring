@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { EVENT_SLUG } from '@/lib/config'
 import { getRekap, categoryRanking, type Medal, type RekapTeam } from '@/lib/scoring'
 import { AutoRefresh } from './AutoRefresh'
@@ -98,9 +97,7 @@ export default async function LivePage() {
                       </td>
                       <td className="px-3 py-2">
                         <span className="mr-2 text-muted-foreground tabular-nums">{t.number}</span>
-                        <Link href={`/live/${t.teamId}`} className="font-medium text-primary underline-offset-2 hover:underline dark:text-blue-300">
-                          {t.name}
-                        </Link>
+                        <span className="font-medium">{t.name}</span>
                         {t.penalty > 0 && <span className="ml-2 text-xs font-semibold text-red-600">−{t.penalty}</span>}
                       </td>
                       {categories.map((c) => {
@@ -143,7 +140,7 @@ export default async function LivePage() {
             </section>
 
             <p className="text-center text-xs text-muted-foreground">
-              Skor diperbarui otomatis setiap 15 detik · Ketuk nama tim untuk rincian nilai
+              Skor diperbarui otomatis setiap 15 detik
             </p>
           </>
         )}
