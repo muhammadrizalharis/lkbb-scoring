@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
+import { getSession, hasAtLeast } from '@/lib/auth'
 import { ScoreForm } from '../../ScoreForm'
 
 export const dynamic = 'force-dynamic'
@@ -30,13 +31,17 @@ export default async function SheetPage({
 
   const sheet = await prisma.scoreSheet.findUnique({
     where: { teamId_judgeId_categoryId: { teamId, judgeId, categoryId: judge.categoryId } },
-    include: { items: true },
+    include: { items: true, enteredBy: true },
   })
 
   const initialValues = Object.fromEntries(sheet?.items.map((i) => [i.criterionId, i.value]) ?? [])
   const initialNotes = Object.fromEntries(
     sheet?.items.filter((i) => i.note).map((i) => [i.criterionId, i.note as string]) ?? [],
   )
+
+  // Lembar yang sudah FINAL dikunci untuk operator (cegah input dobel); admin+ tetap bisa koreksi.
+  const session = await getSession()
+  const locked = sheet?.status === 'FINAL' && !(session && hasAtLeast(session.role, 'ADMIN'))
 
   return (
     <div className="space-y-4">
@@ -71,6 +76,8 @@ export default async function SheetPage({
         initialNotes={initialNotes}
         status={sheet?.status ?? null}
         maxScore={judge.category.maxScore}
+        locked={locked}
+        enteredBy={sheet?.enteredBy?.name ?? null}
       />
     </div>
   )

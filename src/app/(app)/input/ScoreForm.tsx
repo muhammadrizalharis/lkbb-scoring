@@ -14,11 +14,23 @@ type Props = {
   initialNotes: Record<string, string>
   status: 'DRAFT' | 'FINAL' | null
   maxScore: number
+  locked: boolean
+  enteredBy: string | null
 }
 
 const initialState: SaveState = {}
 
-export function ScoreForm({ teamId, judgeId, groups, initialValues, initialNotes, status, maxScore }: Props) {
+export function ScoreForm({
+  teamId,
+  judgeId,
+  groups,
+  initialValues,
+  initialNotes,
+  status,
+  maxScore,
+  locked,
+  enteredBy,
+}: Props) {
   const [values, setValues] = useState<Record<string, number>>(initialValues)
   const [state, formAction, pending] = useActionState(saveSheetAction, initialState)
 
@@ -58,6 +70,7 @@ export function ScoreForm({ teamId, judgeId, groups, initialValues, initialNotes
                           key={option}
                           type="button"
                           aria-pressed={active}
+                          disabled={locked}
                           onClick={() =>
                             setValues((prev) => {
                               const next = { ...prev }
@@ -67,10 +80,10 @@ export function ScoreForm({ teamId, judgeId, groups, initialValues, initialNotes
                               return next
                             })
                           }
-                          className={`h-10 w-12 rounded-lg text-sm font-bold tabular-nums transition ${
+                          className={`h-10 w-12 rounded-lg text-sm font-bold tabular-nums transition disabled:cursor-not-allowed disabled:hover:scale-100 ${
                             active
                               ? 'bg-gradient-to-br from-primary to-blue-500 text-primary-foreground shadow-md shadow-primary/30 ring-2 ring-ring ring-offset-2 ring-offset-card'
-                              : 'bg-muted text-foreground hover:bg-accent hover:scale-105'
+                              : 'bg-muted text-foreground hover:bg-accent hover:scale-105 disabled:opacity-50'
                           }`}
                         >
                           {option}
@@ -82,8 +95,9 @@ export function ScoreForm({ teamId, judgeId, groups, initialValues, initialNotes
                     name={`n:${criterion.id}`}
                     defaultValue={initialNotes[criterion.id] ?? ''}
                     maxLength={500}
+                    disabled={locked}
                     placeholder="Keterangan (opsional)…"
-                    className="mt-1 w-full rounded-lg border border-input bg-background/40 px-3 py-1.5 text-xs outline-none focus:border-ring"
+                    className="mt-1 w-full rounded-lg border border-input bg-background/40 px-3 py-1.5 text-xs outline-none focus:border-ring disabled:opacity-60"
                   />
                 </li>
               )
@@ -112,27 +126,35 @@ export function ScoreForm({ teamId, judgeId, groups, initialValues, initialNotes
             </p>
           </div>
 
-          {state.error && <p className="text-sm font-medium text-red-600">{state.error}</p>}
-          {state.ok && !state.error && <p className="text-sm font-medium text-emerald-600">Tersimpan.</p>}
+          {locked ? (
+            <p className="flex items-center gap-2 text-sm font-medium text-amber-600 dark:text-amber-400">
+              🔒 Terkunci — sudah difinalkan{enteredBy ? ` oleh ${enteredBy}` : ''}. Hubungi admin untuk koreksi.
+            </p>
+          ) : (
+            <>
+              {state.error && <p className="text-sm font-medium text-red-600">{state.error}</p>}
+              {state.ok && !state.error && <p className="text-sm font-medium text-emerald-600">Tersimpan.</p>}
 
-          <button
-            type="submit"
-            name="finalize"
-            value="0"
-            disabled={pending}
-            className="rounded-xl border border-input bg-card px-4 py-2.5 font-semibold transition hover:bg-accent disabled:opacity-50"
-          >
-            Simpan draf
-          </button>
-          <button
-            type="submit"
-            name="finalize"
-            value="1"
-            disabled={pending || missing > 0}
-            className="rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 px-5 py-2.5 font-semibold text-white shadow-lg shadow-emerald-600/25 transition hover:opacity-95 disabled:opacity-40 disabled:shadow-none"
-          >
-            {pending ? 'Menyimpan…' : 'Simpan & Finalkan'}
-          </button>
+              <button
+                type="submit"
+                name="finalize"
+                value="0"
+                disabled={pending}
+                className="rounded-xl border border-input bg-card px-4 py-2.5 font-semibold transition hover:bg-accent disabled:opacity-50"
+              >
+                Simpan draf
+              </button>
+              <button
+                type="submit"
+                name="finalize"
+                value="1"
+                disabled={pending || missing > 0}
+                className="rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 px-5 py-2.5 font-semibold text-white shadow-lg shadow-emerald-600/25 transition hover:opacity-95 disabled:opacity-40 disabled:shadow-none"
+              >
+                {pending ? 'Menyimpan…' : 'Simpan & Finalkan'}
+              </button>
+            </>
+          )}
         </div>
       </div>
     </form>

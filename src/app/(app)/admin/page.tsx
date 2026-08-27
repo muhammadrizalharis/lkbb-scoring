@@ -14,6 +14,11 @@ const SUPER_LINKS = [
     desc: 'Ubah nama lomba & penyelenggara, dan aktifkan mode LIVE (badge transparan di header).',
   },
   {
+    href: '/admin/pengguna',
+    title: 'Kelola Akun',
+    desc: 'Buat akun operator/viewer agar tiap petugas login sendiri. Data tersinkron, anti input dobel.',
+  },
+  {
     href: '/admin/rubrik',
     title: 'Format Penilaian (Rubrik)',
     desc: 'Susun sendiri kategori, grup, butir, dan pilihan nilai. Khusus Super Admin.',

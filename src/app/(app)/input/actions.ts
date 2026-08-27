@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
-import { requireSession } from '@/lib/auth'
+import { requireSession, hasAtLeast } from '@/lib/auth'
 
 const schema = z.object({
   teamId: z.string().min(1),
@@ -53,6 +53,15 @@ export async function saveSheetAction(_prev: SaveState, formData: FormData): Pro
   })
   const team = await prisma.team.findUnique({ where: { id: teamId } })
   if (!judge || !team || judge.eventId !== team.eventId) return { error: 'Tim atau juri tidak dikenal.' }
+
+  // Cegah input dobel: lembar yang sudah FINAL hanya boleh diubah admin ke atas.
+  const existing = await prisma.scoreSheet.findUnique({
+    where: { teamId_judgeId_categoryId: { teamId, judgeId, categoryId: judge.categoryId } },
+    select: { status: true },
+  })
+  if (existing?.status === 'FINAL' && !hasAtLeast(session.role, 'ADMIN')) {
+    return { error: 'Lembar ini sudah difinalkan operator lain. Minta admin membukanya bila perlu koreksi.' }
+  }
 
   const criteria = judge.category.groups.flatMap((g) => g.criteria)
   const allowed = new Map(criteria.map((c) => [c.id, c.options]))
