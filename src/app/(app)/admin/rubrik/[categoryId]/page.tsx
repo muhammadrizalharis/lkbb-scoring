@@ -182,7 +182,7 @@ export default async function EditCategoryPage({
           <RubricForm action={addGroupAction} submitLabel="Tambah grup">
             <input type="hidden" name="categoryId" value={category.id} />
             <Field label="Kode (opsional)" name="code" placeholder="A" className="w-24" />
-            <Field label="Nama grup" name="name" required placeholder="Gerakan Berjalan ke Berjalan" />
+            <Field label="Nama grup" name="name" required placeholder="Aspek Penilaian" />
           </RubricForm>
         </div>
       )}

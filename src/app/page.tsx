@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 const FEATURES = [
   {
     title: 'Input nilai per juri',
-    desc: 'Setiap juri mengisi nilai tiap gerakan sesuai rubrik, lengkap dengan catatan bila perlu.',
+    desc: 'Setiap juri mengisi nilai tiap butir sesuai rubrik, lengkap dengan catatan bila perlu.',
     icon: 'M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z',
   },
   {
@@ -24,7 +24,7 @@ const FEATURES = [
   },
   {
     title: 'Nilai transparan',
-    desc: 'Peserta dapat melihat rincian nilai asli setiap gerakan dari tiap juri.',
+    desc: 'Peserta dapat melihat rincian nilai asli setiap butir dari tiap juri.',
     icon: 'M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z',
   },
 ]
@@ -80,7 +80,7 @@ export default async function LandingPage() {
             </Link>
           ) : (
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-4 py-1.5 text-sm font-medium text-muted-foreground">
-              Sistem Penilaian Lomba Baris-Berbaris
+              Sistem Penilaian & Rekapitulasi Lomba
             </span>
           )}
 
@@ -89,7 +89,7 @@ export default async function LandingPage() {
             <span className="bg-gradient-to-br from-primary to-blue-500 bg-clip-text text-transparent">cepat &amp; transparan</span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
-            Paskitactical membantu panitia menghitung nilai LKBB — dari input juri per gerakan hingga penentuan Juara Umum — secara otomatis dan real-time.
+            Paskitactical membantu panitia menghitung nilai lomba apa pun yang bernilai angka — dari input juri per butir hingga penentuan Juara Umum — secara otomatis dan real-time.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">

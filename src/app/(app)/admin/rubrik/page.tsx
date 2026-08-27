@@ -90,8 +90,8 @@ export default async function RubricPage() {
           <p className="text-sm text-muted-foreground">Batalkan publish dulu untuk menambah kategori.</p>
         ) : (
           <RubricForm action={createCategoryAction} submitLabel="Tambah kategori">
-            <Field label="Kode" name="code" required placeholder="PBB" className="w-32" />
-            <Field label="Nama kategori" name="name" required placeholder="PBB Gerakan Dasar" />
+            <Field label="Kode" name="code" required placeholder="TEK" className="w-32" />
+            <Field label="Nama kategori" name="name" required placeholder="Teknik Dasar" />
           </RubricForm>
         )}
       </div>

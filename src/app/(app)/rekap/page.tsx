@@ -50,7 +50,7 @@ export default async function RekapPage() {
               : 'Juara Umum = akumulasi nilai semua kategori (× bobot) dikurangi penalti.'}
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            Klik nama tim untuk melihat rincian nilai per butir (per gerakan).
+            Klik nama tim untuk melihat rincian nilai per butir.
           </p>
         </div>
         <div className="flex items-center gap-2 print:hidden">

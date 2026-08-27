@@ -32,7 +32,7 @@ export default async function EventSettingsPage() {
 
       <div className="rounded-2xl bg-card p-5 shadow-sm ring-1 ring-border">
         <AdminForm action={updateEventAction} submitLabel="Simpan">
-          <Field label="Nama lomba" name="name" defaultValue={event.name} required placeholder="Contoh: LKBB SMANTIB 2026" />
+          <Field label="Nama lomba" name="name" defaultValue={event.name} required placeholder="Contoh: Lomba Cerdas Cermat 2026" />
           <Field label="Penyelenggara (opsional)" name="host" defaultValue={event.host ?? ''} placeholder="Contoh: OSIS SMAN Titian Teras" />
           <label className="flex items-center gap-2 pb-2 text-sm">
             <input type="checkbox" name="liveMode" defaultChecked={event.liveMode} className="h-4 w-4" />

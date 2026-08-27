@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Paskitactical — Penilaian & Rekap Lomba",
-  description: "Paskitactical — sistem penilaian dan rekapitulasi lomba (LKBB)",
+  description: "Paskitactical — sistem penilaian & rekapitulasi untuk lomba apa pun yang bernilai angka.",
 };
 
 // Menyetel tema sebelum render pertama agar tidak ada kedipan (flash) warna.
