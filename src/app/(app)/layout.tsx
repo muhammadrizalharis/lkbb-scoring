@@ -54,41 +54,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </span>
           </Link>
 
-          {event && (
-            <Link
-              href="/rekap"
-              title={event.host ?? undefined}
-              className={`hidden items-center gap-2 rounded-full px-3 py-1.5 text-sm transition md:inline-flex ${
-                event.liveMode
-                  ? 'bg-red-500/10 text-red-600 ring-1 ring-red-500/30 hover:bg-red-500/15 dark:text-red-400'
-                  : 'bg-muted text-muted-foreground hover:bg-accent'
-              }`}
-            >
-              {event.liveMode && (
-                <span className="relative flex size-2">
-                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-red-500 opacity-75" />
-                  <span className="relative inline-flex size-2 rounded-full bg-red-600" />
-                </span>
-              )}
-              {event.liveMode && <span className="font-bold tracking-wide">LIVE</span>}
-              <span className="max-w-[14rem] truncate font-semibold">{event.name}</span>
-            </Link>
-          )}
-
           <NavLinks items={nav} />
 
           <div className="flex items-center gap-3">
-            <a
-              href="https://www.instagram.com/mhmmddrizal/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden text-right text-[11px] leading-tight text-muted-foreground lg:block"
-            >
-              Developed by
-              <span className="block font-semibold text-primary hover:underline dark:text-blue-300">
-                Muhammad Rizal Haris
-              </span>
-            </a>
             <div className="hidden text-right sm:block">
               <p className="text-sm font-semibold leading-tight">{session.name}</p>
               <p className="text-[11px] font-medium text-primary dark:text-blue-300">
@@ -103,8 +71,46 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </form>
           </div>
         </div>
+        {event && (
+          <div
+            className={`border-t ${
+              event.liveMode ? 'border-red-500/20 bg-red-500/5' : 'border-border/60 bg-muted/30'
+            }`}
+          >
+            <Link
+              href="/rekap"
+              title={event.host ?? undefined}
+              className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-1.5 text-xs transition hover:opacity-80"
+            >
+              {event.liveMode && (
+                <span className="relative flex size-2">
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-red-500 opacity-75" />
+                  <span className="relative inline-flex size-2 rounded-full bg-red-600" />
+                </span>
+              )}
+              {event.liveMode && (
+                <span className="font-bold tracking-wide text-red-600 dark:text-red-400">LIVE</span>
+              )}
+              <span className="font-semibold">{event.name}</span>
+              {event.host && <span className="text-muted-foreground">· {event.host}</span>}
+            </Link>
+          </div>
+        )}
       </header>
       <main className="mx-auto w-full max-w-7xl flex-1 p-4 sm:p-6">{children}</main>
+      <footer className="border-t border-border/60">
+        <div className="mx-auto max-w-7xl px-4 py-4 text-center text-xs text-muted-foreground">
+          Developed by{' '}
+          <a
+            href="https://www.instagram.com/mhmmddrizal/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-primary hover:underline dark:text-blue-300"
+          >
+            Muhammad Rizal Haris
+          </a>
+        </div>
+      </footer>
     </div>
   )
 }
