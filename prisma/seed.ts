@@ -25,8 +25,8 @@ async function seedAdmin() {
   // Password tidak ditimpa agar perubahan lewat aplikasi tidak hilang saat redeploy.
   await prisma.user.upsert({
     where: { username },
-    update: { role: 'ADMIN' },
-    create: { username, name: process.env.SEED_ADMIN_NAME ?? 'Administrator', passwordHash, role: 'ADMIN' },
+    update: { role: 'SUPER_ADMIN' },
+    create: { username, name: process.env.SEED_ADMIN_NAME ?? 'Administrator', passwordHash, role: 'SUPER_ADMIN' },
   })
   console.log(`  ✓ admin "${username}"`)
 }

@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
-import { requireRole } from '@/lib/auth'
+import { requireMinRole } from '@/lib/auth'
 import { EVENT_SLUG } from '@/lib/config'
 
 export type AdminState = { ok?: boolean; error?: string }
@@ -22,7 +22,7 @@ const teamSchema = z.object({
 
 export async function addTeamAction(_prev: AdminState, formData: FormData): Promise<AdminState> {
   try {
-    await requireRole('ADMIN')
+    await requireMinRole('ADMIN')
   } catch {
     return { error: 'Hanya admin yang boleh mengubah data ini.' }
   }
@@ -55,7 +55,7 @@ export async function addTeamAction(_prev: AdminState, formData: FormData): Prom
 }
 
 export async function deleteTeamAction(formData: FormData) {
-  await requireRole('ADMIN')
+  await requireMinRole('ADMIN')
   const id = String(formData.get('id') ?? '')
   const scored = await prisma.scoreItem.count({ where: { sheet: { teamId: id } } })
   // Lindungi data lomba: tim yang sudah punya nilai tidak boleh terhapus.
@@ -72,7 +72,7 @@ const judgeSchema = z.object({
 
 export async function addJudgeAction(_prev: AdminState, formData: FormData): Promise<AdminState> {
   try {
-    await requireRole('ADMIN')
+    await requireMinRole('ADMIN')
   } catch {
     return { error: 'Hanya admin yang boleh mengubah data ini.' }
   }
@@ -110,7 +110,7 @@ export async function addJudgeAction(_prev: AdminState, formData: FormData): Pro
 }
 
 export async function deleteJudgeAction(formData: FormData) {
-  await requireRole('ADMIN')
+  await requireMinRole('ADMIN')
   const id = String(formData.get('id') ?? '')
   const scored = await prisma.scoreItem.count({ where: { sheet: { judgeId: id } } })
   if (scored === 0) await prisma.judge.delete({ where: { id } })
@@ -126,7 +126,7 @@ const weightSchema = z.object({
 
 export async function updateCategoryAction(_prev: AdminState, formData: FormData): Promise<AdminState> {
   try {
-    await requireRole('ADMIN')
+    await requireMinRole('ADMIN')
   } catch {
     return { error: 'Hanya admin yang boleh mengubah data ini.' }
   }

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { getSession } from '@/lib/auth'
+import { getSession, hasAtLeast } from '@/lib/auth'
 import { logoutAction } from '../login/actions'
 
 const NAV = [
@@ -14,6 +14,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const session = await getSession()
   if (!session) redirect('/login')
 
+  const nav = hasAtLeast(session.role, 'SUPER_ADMIN')
+    ? [...NAV, { href: '/admin/rubrik', label: 'Rubrik' }]
+    : NAV
+
   return (
     <div className="flex min-h-full flex-col">
       <header className="border-b border-slate-200 bg-white">
@@ -22,7 +26,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             Rekap LKBB
           </Link>
           <nav className="flex flex-1 flex-wrap gap-1 text-sm">
-            {NAV.map((item) => (
+            {nav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

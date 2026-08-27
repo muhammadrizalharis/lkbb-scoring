@@ -7,8 +7,15 @@ import { prisma } from './db'
 const COOKIE = 'lkbb_session'
 const MAX_AGE = 60 * 60 * 12
 
-export type Role = 'ADMIN' | 'OPERATOR' | 'VIEWER'
+export type Role = 'SUPER_ADMIN' | 'ADMIN' | 'OPERATOR' | 'VIEWER'
 export type Session = { userId: string; username: string; name: string; role: Role }
+
+/** Peringkat peran; makin tinggi makin luas kewenangannya. */
+const ROLE_RANK: Record<Role, number> = { VIEWER: 0, OPERATOR: 1, ADMIN: 2, SUPER_ADMIN: 3 }
+
+export function hasAtLeast(role: Role, min: Role) {
+  return ROLE_RANK[role] >= ROLE_RANK[min]
+}
 
 function secret() {
   const value = process.env.AUTH_SECRET
@@ -64,6 +71,13 @@ export async function requireSession(): Promise<Session> {
 export async function requireRole(...roles: Role[]): Promise<Session> {
   const session = await requireSession()
   if (!roles.includes(session.role)) throw new Error('FORBIDDEN')
+  return session
+}
+
+/** Lolos bila peran pengguna setara atau lebih tinggi dari `min`. */
+export async function requireMinRole(min: Role): Promise<Session> {
+  const session = await requireSession()
+  if (!hasAtLeast(session.role, min)) throw new Error('FORBIDDEN')
   return session
 }
 

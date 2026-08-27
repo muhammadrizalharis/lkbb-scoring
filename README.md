@@ -22,6 +22,36 @@ panitia harus menjumlahkan ribuan angka secara manual. Sistem ini menghilangkan 
 Rentang di atas cocok persis dengan angka total yang tercetak pada form asli
 (mis. Variasi+Formasi = 65–200), sebagai verifikasi bahwa rubrik tersalin dengan benar.
 
+Rubrik ini hanyalah **template awal**. Format penilaian **sepenuhnya bisa diubah lewat aplikasi**
+(lihat bagian berikut) tanpa menyentuh kode — cocok bila format berbeda tiap tahun/lomba.
+
+## Mengubah format penilaian (Super Admin)
+
+Menu **Rubrik** (`/admin/rubrik`) hanya terlihat oleh peran **Super Admin**. Di sana ia dapat:
+
+- Menambah / mengubah / menghapus **kategori** (PBB, Kostum, dll) beserta kode dan urutannya.
+- Menyusun **grup** di dalam kategori (mis. "Gerakan Berjalan ke Berjalan").
+- Menambah **butir** dan menentukan **daftar pilihan nilainya** (mis. `6, 10, 14, 18`).
+- Mengurutkan kategori, grup, dan butir dengan tombol ▲▼.
+
+Rentang minimum–maksimum tiap kategori **dihitung ulang otomatis** dari pilihan nilai butirnya.
+Perubahan langsung dipakai di halaman Input Nilai dan Rekap.
+
+**Pengaman data:** begitu sebuah kategori sudah memiliki nilai tersimpan, strukturnya **dikunci** —
+nama masih boleh diubah, tetapi menambah/menghapus butir atau mengubah pilihan nilai dinonaktifkan
+agar nilai yang sudah masuk tidak menjadi tidak sah.
+
+### Peran pengguna
+
+| Peran | Kewenangan |
+|---|---|
+| **SUPER_ADMIN** | Semua, termasuk menyusun format penilaian (rubrik). |
+| **ADMIN** | Kelola tim, juri, bobot kategori. Tidak bisa mengubah struktur rubrik. |
+| **OPERATOR** | Memasukkan dan memfinalkan nilai. |
+| **VIEWER** | Hanya melihat. |
+
+Akun awal dari seed dibuat sebagai **SUPER_ADMIN**.
+
 ## Cara kerja perhitungan
 
 1. Setiap butir hanya menerima **nilai dari daftar resminya** (mis. `Bersaf Kumpul` hanya boleh
