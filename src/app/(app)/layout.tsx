@@ -6,10 +6,10 @@ import { EVENT_SLUG } from '@/lib/config'
 import { getSession, hasAtLeast } from '@/lib/auth'
 import { logoutAction } from '../login/actions'
 import { NavLinks, type NavItem } from './NavLinks'
-import { ThemeToggle } from './ThemeToggle'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 const NAV: NavItem[] = [
-  { href: '/', label: 'Beranda' },
+  { href: '/beranda', label: 'Beranda' },
   { href: '/input', label: 'Input Nilai' },
   { href: '/rekap', label: 'Rekapitulasi' },
 ]
@@ -39,7 +39,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="flex min-h-full flex-col">
       <header className="sticky top-0 z-30 border-b border-border/80 bg-card/70 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3">
-          <Link href="/" className="flex items-center gap-2.5">
+          <Link href="/beranda" className="flex items-center gap-2.5">
             <Image
               src="/logo-mark.png"
               alt="Paskitactical"

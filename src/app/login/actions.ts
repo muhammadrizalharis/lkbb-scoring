@@ -24,10 +24,10 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
     name: user.name,
     role: user.role as Role,
   })
-  redirect('/')
+  redirect('/beranda')
 }
 
 export async function logoutAction() {
   await destroySession()
-  redirect('/login')
+  redirect('/')
 }
