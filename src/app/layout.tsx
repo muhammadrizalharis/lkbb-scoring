@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SkorIcal — Penilaian & Rekap Lomba",
-  description: "SkorIcal — sistem penilaian dan rekapitulasi lomba (LKBB)",
+  title: "Paskitactical — Penilaian & Rekap Lomba",
+  description: "Paskitactical — sistem penilaian dan rekapitulasi lomba (LKBB)",
 };
 
 // Menyetel tema sebelum render pertama agar tidak ada kedipan (flash) warna.

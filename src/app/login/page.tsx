@@ -36,7 +36,7 @@ export default function LoginPage() {
               <path d="M6 8H4a2 2 0 0 0 0 4h1.5M18 8h2a2 2 0 0 1 0 4h-1.5" />
             </svg>
           </span>
-          <h1 className="text-xl font-bold tracking-tight">SkorIcal</h1>
+          <h1 className="text-xl font-bold tracking-tight">Paskitactical</h1>
           <p className="mt-1 text-sm text-muted-foreground">Masuk untuk memasukkan atau melihat nilai.</p>
         </div>
 
