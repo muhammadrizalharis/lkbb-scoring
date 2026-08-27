@@ -202,4 +202,3 @@ export async function resetEventDataAction(_prev: AdminState, formData: FormData
 
   return { ok: true, message: `Terhapus: ${summary.teams} tim, ${summary.judges} juri, ${summary.sheets} lembar nilai.` }
 }
-

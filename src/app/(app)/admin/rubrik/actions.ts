@@ -435,9 +435,11 @@ async function swapOrder(
     orderBy: { order: dir === 'up' ? 'desc' : 'asc' },
   })
   if (!neighbor) return
+  // Pakai order sementara -1 agar tak melanggar unique([groupId, order]) saat menukar.
   await prisma.$transaction([
-    prisma.criterion.update({ where: { id: item.id }, data: { order: neighbor.order } }),
+    prisma.criterion.update({ where: { id: item.id }, data: { order: -1 } }),
     prisma.criterion.update({ where: { id: neighbor.id }, data: { order: item.order } }),
+    prisma.criterion.update({ where: { id: item.id }, data: { order: neighbor.order } }),
   ])
   revalidatePath(`/admin/rubrik/${item.group.categoryId}`)
 }
