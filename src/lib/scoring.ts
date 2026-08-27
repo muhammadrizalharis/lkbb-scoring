@@ -174,4 +174,3 @@ export function categoryRanking(teams: RekapTeam[], categoryId: string) {
     .filter((e) => e.cat)
     .sort((a, b) => b.cat.raw - a.cat.raw || a.team.number - b.team.number)
 }
-

@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { prisma } from '@/lib/db'
 import { EVENT_SLUG } from '@/lib/config'
 import { addJudgeAction, deleteJudgeAction } from '../actions'
@@ -20,6 +21,9 @@ export default async function AdminJudgePage() {
 
   return (
     <div className="space-y-6">
+      <Link href="/admin" className="text-sm text-muted-foreground underline">
+        ← Kembali ke Pengaturan
+      </Link>
       <div>
         <h1 className="text-2xl font-bold">Juri</h1>
         <p className="text-sm text-muted-foreground">

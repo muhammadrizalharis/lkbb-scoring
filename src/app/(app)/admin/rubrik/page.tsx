@@ -32,6 +32,9 @@ export default async function RubricPage() {
 
   return (
     <div className="space-y-6">
+      <Link href="/admin" className="text-sm text-muted-foreground underline">
+        ← Kembali ke Pengaturan
+      </Link>
       <div>
         <h1 className="text-2xl font-bold">Format Penilaian (Rubrik)</h1>
         <p className="max-w-2xl text-sm text-muted-foreground">

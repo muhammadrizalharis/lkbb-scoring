@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { prisma } from '@/lib/db'
 import { EVENT_SLUG } from '@/lib/config'
 import { addTeamAction, deleteTeamAction } from '../actions'
@@ -21,6 +22,9 @@ export default async function AdminTeamPage() {
 
   return (
     <div className="space-y-6">
+      <Link href="/admin" className="text-sm text-muted-foreground underline">
+        ← Kembali ke Pengaturan
+      </Link>
       <h1 className="text-2xl font-bold">Tim Peserta</h1>
 
       <div className="rounded-xl bg-card p-5 shadow-sm ring-1 ring-border">
