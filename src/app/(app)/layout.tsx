@@ -25,7 +25,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const nav: NavItem[] = [...NAV]
   if (hasAtLeast(session.role, 'OPERATOR')) nav.push({ href: '/penalti', label: 'Pengurangan' })
-  nav.push({ href: '/admin', label: 'Pengaturan' })
+  if (hasAtLeast(session.role, 'ADMIN')) nav.push({ href: '/admin', label: 'Pengaturan' })
   if (hasAtLeast(session.role, 'SUPER_ADMIN')) nav.push({ href: '/admin/rubrik', label: 'Rubrik' })
 
   const roleLabel: Record<string, string> = {

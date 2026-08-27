@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { getSession, hasAtLeast } from '@/lib/auth'
 
 const LINKS = [
@@ -37,7 +38,10 @@ const SUPER_LINKS = [
 
 export default async function AdminPage() {
   const session = await getSession()
-  const links = session && hasAtLeast(session.role, 'SUPER_ADMIN') ? [...LINKS, ...SUPER_LINKS] : LINKS
+  if (!session) redirect('/login')
+  if (!hasAtLeast(session.role, 'ADMIN')) redirect('/beranda')
+
+  const links = hasAtLeast(session.role, 'SUPER_ADMIN') ? [...LINKS, ...SUPER_LINKS] : LINKS
 
   return (
     <div className="space-y-6">

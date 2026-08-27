@@ -1,5 +1,7 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/db'
+import { getSession, hasAtLeast } from '@/lib/auth'
 import { EVENT_SLUG } from '@/lib/config'
 import { addJudgeAction, deleteJudgeAction } from '../actions'
 import { AdminForm, Field } from '../AdminForm'
@@ -7,6 +9,10 @@ import { AdminForm, Field } from '../AdminForm'
 export const dynamic = 'force-dynamic'
 
 export default async function AdminJudgePage() {
+  const session = await getSession()
+  if (!session) redirect('/login')
+  if (!hasAtLeast(session.role, 'ADMIN')) redirect('/beranda')
+
   const event = await prisma.event.findUnique({
     where: { slug: EVENT_SLUG },
     include: {
