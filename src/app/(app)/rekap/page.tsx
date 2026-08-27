@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { EVENT_SLUG } from '@/lib/config'
 import { getRekap, categoryRanking, type Medal, type RekapTeam } from '@/lib/scoring'
 
@@ -43,6 +44,9 @@ export default async function RekapPage() {
             {isMedal
               ? `Tiap kategori memberi medali (emas ${event.goldPoints} poin · perak ${event.silverPoints} · perunggu ${event.bronzePoints}). Juara Umum = poin terbanyak.`
               : 'Juara Umum = akumulasi nilai semua kategori (× bobot) dikurangi penalti.'}
+          </p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Klik nama tim untuk melihat rincian nilai per butir (per gerakan).
           </p>
         </div>
         <a
@@ -119,7 +123,9 @@ export default async function RekapPage() {
                 </td>
                 <td className="px-3 py-2">
                   <span className="mr-2 text-muted-foreground tabular-nums">{t.number}</span>
-                  <span className="font-medium">{t.name}</span>
+                  <Link href={`/rekap/${t.teamId}`} className="font-medium text-primary underline-offset-2 hover:underline dark:text-blue-300">
+                    {t.name}
+                  </Link>
                   {t.overallTied && (
                     <span className="ml-2 rounded bg-danger/20 px-1.5 py-0.5 text-xs font-bold text-red-700 dark:text-red-300">
                       SERI

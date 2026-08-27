@@ -174,3 +174,93 @@ export function categoryRanking(teams: RekapTeam[], categoryId: string) {
     .filter((e) => e.cat)
     .sort((a, b) => b.cat.raw - a.cat.raw || a.team.number - b.team.number)
 }
+
+export type DetailJudge = { id: string; code: string; name: string; total: number; status: string }
+export type DetailCriterion = {
+  criterionId: string
+  name: string
+  options: number[]
+  /** Nilai per juri, urut sesuai daftar juri kategori (null bila belum diisi). */
+  values: (number | null)[]
+}
+export type DetailGroup = { id: string; code: string | null; name: string; criteria: DetailCriterion[] }
+export type DetailCategory = {
+  categoryId: string
+  code: string
+  name: string
+  judges: DetailJudge[]
+  groups: DetailGroup[]
+  /** Jumlah nilai seluruh juri kategori ini. */
+  total: number
+}
+
+/** Rincian nilai per butir (per gerakan) untuk satu tim — untuk transparansi ke peserta. */
+export async function getTeamDetail(eventSlug: string, teamId: string) {
+  const event = await prisma.event.findUnique({
+    where: { slug: eventSlug },
+    include: {
+      categories: {
+        orderBy: { order: 'asc' },
+        include: {
+          judges: { orderBy: { code: 'asc' } },
+          groups: {
+            orderBy: { order: 'asc' },
+            include: { criteria: { orderBy: { order: 'asc' } } },
+          },
+        },
+      },
+      penalties: { where: { teamId } },
+    },
+  })
+  if (!event) return null
+
+  const team = await prisma.team.findFirst({ where: { id: teamId, eventId: event.id } })
+  if (!team) return null
+
+  const sheets = await prisma.scoreSheet.findMany({
+    where: { eventId: event.id, teamId },
+    include: { items: true },
+  })
+
+  const categories: DetailCategory[] = event.categories.map((category) => {
+    const judges = category.judges
+    // Peta cepat: judgeId -> (criterionId -> value) dari lembar nilai tim ini.
+    const byJudge = new Map<string, Map<string, number>>()
+    let total = 0
+    for (const judge of judges) {
+      const sheet = sheets.find((s) => s.judgeId === judge.id && s.categoryId === category.id)
+      const map = new Map<string, number>()
+      if (sheet) {
+        for (const item of sheet.items) map.set(item.criterionId, item.value)
+        total += sheet.total
+      }
+      byJudge.set(judge.id, map)
+    }
+
+    return {
+      categoryId: category.id,
+      code: category.code,
+      name: category.name,
+      judges: judges.map((j) => {
+        const sheet = sheets.find((s) => s.judgeId === j.id && s.categoryId === category.id)
+        return { id: j.id, code: j.code, name: j.name, total: sheet?.total ?? 0, status: sheet?.status ?? 'KOSONG' }
+      }),
+      groups: category.groups.map((group) => ({
+        id: group.id,
+        code: group.code,
+        name: group.name,
+        criteria: group.criteria.map((c) => ({
+          criterionId: c.id,
+          name: c.name,
+          options: c.options,
+          values: judges.map((j) => byJudge.get(j.id)?.get(c.id) ?? null),
+        })),
+      })),
+      total,
+    }
+  })
+
+  const penalty = event.penalties.reduce((sum, p) => sum + p.points, 0)
+
+  return { event, team, categories, penalty }
+}
