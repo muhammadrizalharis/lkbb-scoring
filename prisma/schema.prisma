@@ -40,8 +40,8 @@ model Event {
   recapOpen Boolean  @default(false)
   /// Bila true, rubrik dikunci (lomba sudah dipublish). Diatur super admin.
   published Boolean  @default(false)
-  /// Metode Juara Umum: "MEDAL_POINTS" (poin emas/perak/perunggu) atau "TOTAL_SCORE".
-  overallMethod String @default("MEDAL_POINTS")
+  /// Metode Juara Umum: "TOTAL_SCORE" (akumulasi nilai) atau "MEDAL_POINTS" (poin medali).
+  overallMethod String @default("TOTAL_SCORE")
   goldPoints    Int    @default(3)
   silverPoints  Int    @default(2)
   bronzePoints  Int    @default(1)

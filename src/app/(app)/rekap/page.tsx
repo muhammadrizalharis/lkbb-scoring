@@ -144,7 +144,7 @@ export default async function RekapPage() {
                     <td key={c.id} className="px-3 py-2 text-center tabular-nums">
                       <div className="flex flex-col items-center leading-tight">
                         <span>{cell?.raw ?? 0}</span>
-                        {cell?.medal && <span title={cell.medal}>{MEDAL_EMOJI[cell.medal]}</span>}
+                        {isMedal && cell?.medal && <span title={cell.medal}>{MEDAL_EMOJI[cell.medal]}</span>}
                       </div>
                     </td>
                   )
@@ -176,7 +176,7 @@ export default async function RekapPage() {
                 {winners.map((w, i) => (
                   <li key={w.team.teamId} className="flex items-center justify-between gap-2">
                     <span className="flex-1 truncate">
-                      <span className="mr-1.5">{['🥇', '🥈', '🥉'][i]}</span>
+                      <span className="mr-1.5">{isMedal ? ['🥇', '🥈', '🥉'][i] : `${i + 1}.`}</span>
                       {w.team.name}
                     </span>
                     <span className="font-semibold tabular-nums">{w.cat.raw}</span>
