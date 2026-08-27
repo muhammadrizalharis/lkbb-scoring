@@ -48,8 +48,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               </svg>
             </span>
             <span className="flex flex-col leading-tight">
-              <span className="text-sm font-bold tracking-tight">Rekap Nilai LKBB</span>
-              <span className="text-[11px] font-medium text-muted-foreground">Sistem Penjurian</span>
+              <span className="text-sm font-bold tracking-tight">SkorIcal</span>
+              <span className="text-[11px] font-medium text-muted-foreground">Penilaian &amp; Rekap Lomba</span>
             </span>
           </Link>
 
