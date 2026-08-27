@@ -100,12 +100,19 @@ export default async function TeamDetailPage({
                         </td>
                       </tr>
                       {group.criteria.map((c) => (
-                        <tr key={c.criterionId}>
+                        <tr key={c.criterionId} className="align-top">
                           <td className="px-4 py-1.5">
                             {c.name}
                             <span className="ml-1 text-xs text-muted-foreground">
                               (maks {Math.max(...c.options)})
                             </span>
+                            {c.notes.map((n, i) =>
+                              n ? (
+                                <div key={i} className="mt-0.5 text-xs italic text-muted-foreground">
+                                  {category.judges.length > 1 ? `${category.judges[i]?.code}: ` : 'Ket: '}“{n}”
+                                </div>
+                              ) : null,
+                            )}
                           </td>
                           {c.values.map((v, i) => (
                             <td key={i} className="px-3 py-1.5 text-right font-semibold tabular-nums">

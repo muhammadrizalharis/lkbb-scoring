@@ -34,6 +34,9 @@ export default async function SheetPage({
   })
 
   const initialValues = Object.fromEntries(sheet?.items.map((i) => [i.criterionId, i.value]) ?? [])
+  const initialNotes = Object.fromEntries(
+    sheet?.items.filter((i) => i.note).map((i) => [i.criterionId, i.note as string]) ?? [],
+  )
 
   return (
     <div className="space-y-4">
@@ -65,6 +68,7 @@ export default async function SheetPage({
           })),
         }))}
         initialValues={initialValues}
+        initialNotes={initialNotes}
         status={sheet?.status ?? null}
         maxScore={judge.category.maxScore}
       />

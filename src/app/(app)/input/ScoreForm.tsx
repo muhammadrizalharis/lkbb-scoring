@@ -11,13 +11,14 @@ type Props = {
   judgeId: string
   groups: FormGroup[]
   initialValues: Record<string, number>
+  initialNotes: Record<string, string>
   status: 'DRAFT' | 'FINAL' | null
   maxScore: number
 }
 
 const initialState: SaveState = {}
 
-export function ScoreForm({ teamId, judgeId, groups, initialValues, status, maxScore }: Props) {
+export function ScoreForm({ teamId, judgeId, groups, initialValues, initialNotes, status, maxScore }: Props) {
   const [values, setValues] = useState<Record<string, number>>(initialValues)
   const [state, formAction, pending] = useActionState(saveSheetAction, initialState)
 
@@ -77,6 +78,13 @@ export function ScoreForm({ teamId, judgeId, groups, initialValues, status, maxS
                       )
                     })}
                   </div>
+                  <input
+                    name={`n:${criterion.id}`}
+                    defaultValue={initialNotes[criterion.id] ?? ''}
+                    maxLength={500}
+                    placeholder="Keterangan (opsional)…"
+                    className="mt-1 w-full rounded-lg border border-input bg-background/40 px-3 py-1.5 text-xs outline-none focus:border-ring"
+                  />
                 </li>
               )
             })}

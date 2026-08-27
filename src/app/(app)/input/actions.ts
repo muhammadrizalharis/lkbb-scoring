@@ -25,11 +25,16 @@ export async function saveSheetAction(_prev: SaveState, formData: FormData): Pro
   if (session.role === 'VIEWER') return { error: 'Peran Anda tidak boleh mengubah nilai.' }
 
   const values: Record<string, number> = {}
+  const notes: Record<string, string> = {}
   for (const [key, raw] of formData.entries()) {
-    if (!key.startsWith('c:')) continue
-    const text = String(raw)
-    if (text === '') continue
-    values[key.slice(2)] = Number(text)
+    if (key.startsWith('c:')) {
+      const text = String(raw)
+      if (text === '') continue
+      values[key.slice(2)] = Number(text)
+    } else if (key.startsWith('n:')) {
+      const text = String(raw).trim().slice(0, 500)
+      if (text) notes[key.slice(2)] = text
+    }
   }
 
   const parsed = schema.safeParse({
@@ -53,12 +58,12 @@ export async function saveSheetAction(_prev: SaveState, formData: FormData): Pro
   const allowed = new Map(criteria.map((c) => [c.id, c.options]))
 
   // Tolak butir asing dan nilai di luar daftar resmi rubrik.
-  const entries: { criterionId: string; value: number }[] = []
+  const entries: { criterionId: string; value: number; note: string | null }[] = []
   for (const [criterionId, value] of Object.entries(parsed.data.values)) {
     const options = allowed.get(criterionId)
     if (!options) return { error: 'Terdapat butir penilaian yang tidak dikenal.' }
     if (!options.includes(value)) return { error: 'Terdapat nilai di luar pilihan yang sah.' }
-    entries.push({ criterionId, value })
+    entries.push({ criterionId, value, note: notes[criterionId] ?? null })
   }
 
   const missing = criteria.length - entries.length
@@ -92,7 +97,7 @@ export async function saveSheetAction(_prev: SaveState, formData: FormData): Pro
     await tx.scoreItem.deleteMany({ where: { sheetId: sheet.id } })
     if (entries.length > 0) {
       await tx.scoreItem.createMany({
-        data: entries.map((e) => ({ sheetId: sheet.id, criterionId: e.criterionId, value: e.value })),
+        data: entries.map((e) => ({ sheetId: sheet.id, criterionId: e.criterionId, value: e.value, note: e.note })),
       })
     }
 

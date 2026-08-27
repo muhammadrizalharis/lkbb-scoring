@@ -190,6 +190,8 @@ export type DetailCriterion = {
   options: number[]
   /** Nilai per juri, urut sesuai daftar juri kategori (null bila belum diisi). */
   values: (number | null)[]
+  /** Keterangan per juri (null bila kosong). */
+  notes: (string | null)[]
 }
 export type DetailGroup = { id: string; code: string | null; name: string; criteria: DetailCriterion[] }
 export type DetailCategory = {
@@ -234,17 +236,23 @@ export async function getTeamDetail(eventSlug: string, teamId: string) {
 
   const categories: DetailCategory[] = event.categories.map((category) => {
     const judges = category.judges
-    // Peta cepat: judgeId -> (criterionId -> value) dari lembar nilai tim ini.
+    // Peta cepat: judgeId -> (criterionId -> value / note) dari lembar nilai tim ini.
     const byJudge = new Map<string, Map<string, number>>()
+    const noteByJudge = new Map<string, Map<string, string>>()
     let total = 0
     for (const judge of judges) {
       const sheet = sheets.find((s) => s.judgeId === judge.id && s.categoryId === category.id)
       const map = new Map<string, number>()
+      const notes = new Map<string, string>()
       if (sheet) {
-        for (const item of sheet.items) map.set(item.criterionId, item.value)
+        for (const item of sheet.items) {
+          map.set(item.criterionId, item.value)
+          if (item.note) notes.set(item.criterionId, item.note)
+        }
         total += sheet.total
       }
       byJudge.set(judge.id, map)
+      noteByJudge.set(judge.id, notes)
     }
 
     return {
@@ -264,6 +272,7 @@ export async function getTeamDetail(eventSlug: string, teamId: string) {
           name: c.name,
           options: c.options,
           values: judges.map((j) => byJudge.get(j.id)?.get(c.id) ?? null),
+          notes: judges.map((j) => noteByJudge.get(j.id)?.get(c.id) ?? null),
         })),
       })),
       total,

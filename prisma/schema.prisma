@@ -184,6 +184,8 @@ model ScoreItem {
   criterion   Criterion @relation(fields: [criterionId], references: [id], onDelete: Cascade)
 
   value Int
+  /// Keterangan opsional dari juri untuk butir ini (alasan nilai).
+  note  String?
 
   @@unique([sheetId, criterionId])
 }
