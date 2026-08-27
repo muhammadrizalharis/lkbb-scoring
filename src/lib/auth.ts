@@ -1,4 +1,5 @@
 import 'server-only'
+import { cache } from 'react'
 import { cookies } from 'next/headers'
 import { SignJWT, jwtVerify } from 'jose'
 import bcrypt from 'bcryptjs'
@@ -45,17 +46,20 @@ export async function destroySession() {
   store.delete(COOKIE)
 }
 
+/** Dedup lookup user dalam satu request (React cache). */
+const loadUser = cache((id: string) =>
+  prisma.user.findUnique({ where: { id }, select: { id: true, username: true, name: true, role: true } }),
+)
+
 export async function getSession(): Promise<Session | null> {
   const token = (await cookies()).get(COOKIE)?.value
   if (!token) return null
   try {
     const { payload } = await jwtVerify(token, secret(), { algorithms: ['HS256'] })
-    return {
-      userId: String(payload.userId),
-      username: String(payload.username),
-      name: String(payload.name),
-      role: payload.role as Role,
-    }
+    // Verifikasi ke DB: sesi batal bila akun dihapus; peran & nama selalu yang terbaru.
+    const user = await loadUser(String(payload.userId))
+    if (!user) return null
+    return { userId: user.id, username: user.username, name: user.name, role: user.role as Role }
   } catch {
     return null
   }

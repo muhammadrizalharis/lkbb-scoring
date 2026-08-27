@@ -100,7 +100,6 @@ export async function resetPasswordAction(_prev: UserState, formData: FormData):
   if (!target) return { error: 'Akun tidak ditemukan.' }
 
   const passwordHash = await bcrypt.hash(parsed.data.password, 12)
-  // Naikkan versi sesi agar sesi lama akun itu ikut logout.
   await prisma.user.update({ where: { id: target.id }, data: { passwordHash } })
   await prisma.auditLog.create({
     data: { userId: session.userId, action: 'RESET_PASSWORD', entity: 'User', entityId: target.id },

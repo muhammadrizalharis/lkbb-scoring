@@ -1,6 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { createSession, destroySession, throttleLogin, verifyCredentials } from '@/lib/auth'
 import type { Role } from '@/lib/auth'
 
@@ -11,7 +12,12 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
   const password = String(formData.get('password') ?? '')
 
   if (!username || !password) return { error: 'Nama pengguna dan kata sandi wajib diisi.' }
-  if (!throttleLogin(username)) {
+
+  const ip = ((await headers()).get('x-forwarded-for') ?? '').split(',')[0].trim() || 'lokal'
+  if (!throttleLogin(`ip:${ip}`, 30, 5 * 60_000)) {
+    return { error: 'Terlalu banyak percobaan dari jaringan ini. Coba lagi beberapa menit lagi.' }
+  }
+  if (!throttleLogin(`user:${username}`)) {
     return { error: 'Terlalu banyak percobaan. Coba lagi beberapa menit lagi.' }
   }
 
