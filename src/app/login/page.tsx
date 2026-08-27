@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { useActionState } from 'react'
 import { loginAction, type LoginState } from './actions'
 
@@ -69,6 +70,13 @@ export default function LoginPage() {
         >
           {pending ? 'Memproses…' : 'Masuk'}
         </button>
+
+        <Link
+          href="/live"
+          className="block rounded-xl border border-border bg-card/50 py-2.5 text-center text-sm font-semibold text-primary transition hover:bg-accent dark:text-blue-300"
+        >
+          Penonton? Lihat skor langsung →
+        </Link>
 
         <p className="text-center text-xs text-muted-foreground">
           Developed by{' '}

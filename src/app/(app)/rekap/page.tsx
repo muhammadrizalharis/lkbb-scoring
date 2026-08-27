@@ -49,12 +49,22 @@ export default async function RekapPage() {
             Klik nama tim untuk melihat rincian nilai per butir (per gerakan).
           </p>
         </div>
-        <a
-          href="/api/rekap/csv"
-          className="rounded-lg border border-input bg-card px-4 py-2 text-sm font-semibold transition hover:bg-accent"
-        >
-          Unduh CSV
-        </a>
+        <div className="flex items-center gap-2">
+          <a
+            href="/live"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-lg border border-input bg-card px-4 py-2 text-sm font-semibold transition hover:bg-accent"
+          >
+            Tampilan Publik ↗
+          </a>
+          <a
+            href="/api/rekap/csv"
+            className="rounded-lg border border-input bg-card px-4 py-2 text-sm font-semibold transition hover:bg-accent"
+          >
+            Unduh CSV
+          </a>
+        </div>
       </div>
 
       {incomplete > 0 && (
