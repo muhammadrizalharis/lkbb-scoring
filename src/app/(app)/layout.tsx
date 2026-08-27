@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { prisma } from '@/lib/db'
+import { EVENT_SLUG } from '@/lib/config'
 import { getSession, hasAtLeast } from '@/lib/auth'
 import { logoutAction } from '../login/actions'
 import { NavLinks, type NavItem } from './NavLinks'
@@ -14,6 +16,11 @@ const NAV: NavItem[] = [
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession()
   if (!session) redirect('/login')
+
+  const event = await prisma.event.findUnique({
+    where: { slug: EVENT_SLUG },
+    select: { name: true, host: true, liveMode: true },
+  })
 
   const nav: NavItem[] = [...NAV]
   if (hasAtLeast(session.role, 'OPERATOR')) nav.push({ href: '/penalti', label: 'Pengurangan' })
@@ -52,6 +59,27 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               <span className="text-[11px] font-medium text-muted-foreground">Penilaian &amp; Rekap Lomba</span>
             </span>
           </Link>
+
+          {event && (
+            <Link
+              href="/rekap"
+              title={event.host ?? undefined}
+              className={`hidden items-center gap-2 rounded-full px-3 py-1.5 text-sm transition md:inline-flex ${
+                event.liveMode
+                  ? 'bg-red-500/10 text-red-600 ring-1 ring-red-500/30 hover:bg-red-500/15 dark:text-red-400'
+                  : 'bg-muted text-muted-foreground hover:bg-accent'
+              }`}
+            >
+              {event.liveMode && (
+                <span className="relative flex size-2">
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-red-500 opacity-75" />
+                  <span className="relative inline-flex size-2 rounded-full bg-red-600" />
+                </span>
+              )}
+              {event.liveMode && <span className="font-bold tracking-wide">LIVE</span>}
+              <span className="max-w-[14rem] truncate font-semibold">{event.name}</span>
+            </Link>
+          )}
 
           <NavLinks items={nav} />
 

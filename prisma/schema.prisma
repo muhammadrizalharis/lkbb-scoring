@@ -40,6 +40,10 @@ model Event {
   recapOpen Boolean  @default(false)
   /// Bila true, rubrik dikunci (lomba sudah dipublish). Diatur super admin.
   published Boolean  @default(false)
+  /// Bila true, tampilkan badge "LIVE" di header (penilaian transparan sedang berlangsung).
+  liveMode  Boolean  @default(false)
+  /// Penyelenggara/subjudul lomba (opsional).
+  host      String?
   /// Metode Juara Umum: "TOTAL_SCORE" (akumulasi nilai) atau "MEDAL_POINTS" (poin medali).
   overallMethod String @default("TOTAL_SCORE")
   goldPoints    Int    @default(3)

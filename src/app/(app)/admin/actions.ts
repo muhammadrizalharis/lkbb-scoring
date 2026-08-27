@@ -236,3 +236,35 @@ export async function updateOverallConfigAction(_prev: AdminState, formData: For
   revalidatePath('/')
   return { ok: true, message: 'Pengaturan Juara Umum tersimpan.' }
 }
+
+const eventSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+  host: z.string().trim().max(160).optional(),
+  liveMode: z.boolean(),
+})
+
+/** Ubah nama lomba, penyelenggara, dan mode LIVE. Khusus Super Admin. */
+export async function updateEventAction(_prev: AdminState, formData: FormData): Promise<AdminState> {
+  try {
+    await requireMinRole('SUPER_ADMIN')
+  } catch {
+    return { error: 'Hanya Super Admin yang boleh mengatur lomba.' }
+  }
+
+  const parsed = eventSchema.safeParse({
+    name: formData.get('name'),
+    host: formData.get('host') || undefined,
+    liveMode: formData.get('liveMode') === 'on',
+  })
+  if (!parsed.success) return { error: 'Nama lomba wajib diisi.' }
+
+  const event = await currentEvent()
+  await prisma.event.update({
+    where: { id: event.id },
+    data: { name: parsed.data.name, host: parsed.data.host || null, liveMode: parsed.data.liveMode },
+  })
+
+  // Header (nama + badge LIVE) muncul di semua halaman.
+  revalidatePath('/', 'layout')
+  return { ok: true, message: 'Pengaturan lomba tersimpan.' }
+}

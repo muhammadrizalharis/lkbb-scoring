@@ -9,6 +9,11 @@ const LINKS = [
 
 const SUPER_LINKS = [
   {
+    href: '/admin/event',
+    title: 'Identitas Lomba',
+    desc: 'Ubah nama lomba & penyelenggara, dan aktifkan mode LIVE (badge transparan di header).',
+  },
+  {
     href: '/admin/rubrik',
     title: 'Format Penilaian (Rubrik)',
     desc: 'Susun sendiri kategori, grup, butir, dan pilihan nilai. Khusus Super Admin.',
