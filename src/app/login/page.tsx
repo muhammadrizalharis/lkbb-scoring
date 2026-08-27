@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useActionState } from 'react'
 import { loginAction, type LoginState } from './actions'
 
@@ -21,21 +22,14 @@ export default function LoginPage() {
         className="w-full max-w-sm space-y-6 rounded-3xl bg-card/80 p-8 shadow-2xl shadow-primary/10 ring-1 ring-border backdrop-blur-xl"
       >
         <div className="flex flex-col items-center text-center">
-          <span className="mb-4 grid size-14 place-items-center rounded-2xl bg-gradient-to-br from-primary to-blue-500 text-primary-foreground shadow-lg shadow-primary/30">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="size-7"
-            >
-              <path d="M8 21h8M12 17v4M6 4h12l-1 8a5 5 0 0 1-10 0L6 4z" />
-              <path d="M6 8H4a2 2 0 0 0 0 4h1.5M18 8h2a2 2 0 0 1 0 4h-1.5" />
-            </svg>
-          </span>
+          <Image
+            src="/logo-mark.png"
+            alt="Paskitactical"
+            width={596}
+            height={414}
+            priority
+            className="mb-3 h-20 w-auto drop-shadow"
+          />
           <h1 className="text-xl font-bold tracking-tight">Paskitactical</h1>
           <p className="mt-1 text-sm text-muted-foreground">Masuk untuk memasukkan atau melihat nilai.</p>
         </div>
@@ -75,6 +69,18 @@ export default function LoginPage() {
         >
           {pending ? 'Memproses…' : 'Masuk'}
         </button>
+
+        <p className="text-center text-xs text-muted-foreground">
+          Developed by{' '}
+          <a
+            href="https://www.instagram.com/mhmmddrizal/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-primary hover:underline dark:text-blue-300"
+          >
+            Muhammad Rizal Haris
+          </a>
+        </p>
       </form>
     </main>
   )
