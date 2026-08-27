@@ -55,7 +55,17 @@ export default async function TeamDetailPage({
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-muted/50 px-4 py-2.5">
             <h2 className="font-semibold">{category.name}</h2>
             <span className="text-sm text-muted-foreground">
-              Total kategori: <b className="text-foreground tabular-nums">{category.total}</b>
+              {category.penalty > 0 ? (
+                <>
+                  Total: <b className="text-foreground tabular-nums">{category.total}</b>
+                  <span className="text-red-600"> − {category.penalty}</span> ={' '}
+                  <b className="text-foreground tabular-nums">{Math.max(0, category.total - category.penalty)}</b>
+                </>
+              ) : (
+                <>
+                  Total kategori: <b className="text-foreground tabular-nums">{category.total}</b>
+                </>
+              )}
             </span>
           </div>
 

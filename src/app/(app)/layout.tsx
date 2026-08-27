@@ -9,16 +9,16 @@ const NAV: NavItem[] = [
   { href: '/', label: 'Beranda' },
   { href: '/input', label: 'Input Nilai' },
   { href: '/rekap', label: 'Rekapitulasi' },
-  { href: '/admin', label: 'Pengaturan' },
 ]
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession()
   if (!session) redirect('/login')
 
-  const nav = hasAtLeast(session.role, 'SUPER_ADMIN')
-    ? [...NAV, { href: '/admin/rubrik', label: 'Rubrik' }]
-    : NAV
+  const nav: NavItem[] = [...NAV]
+  if (hasAtLeast(session.role, 'OPERATOR')) nav.push({ href: '/penalti', label: 'Pengurangan' })
+  nav.push({ href: '/admin', label: 'Pengaturan' })
+  if (hasAtLeast(session.role, 'SUPER_ADMIN')) nav.push({ href: '/admin/rubrik', label: 'Rubrik' })
 
   const roleLabel: Record<string, string> = {
     SUPER_ADMIN: 'Super Admin',

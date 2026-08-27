@@ -52,11 +52,15 @@ export async function getRekap(eventSlug: string) {
   const method: OverallMethod = event.overallMethod === 'TOTAL_SCORE' ? 'TOTAL_SCORE' : 'MEDAL_POINTS'
   const medalCap = Math.max(1, Math.min(3, event.medalPlaces))
 
-  // 1. Nilai mentah per tim per kategori.
+  // 1. Nilai mentah per tim per kategori (penalti kategori mengurangi nilai kategori itu).
   const teams: RekapTeam[] = event.teams.map((team) => {
     const categories: CategoryResult[] = event.categories.map((category) => {
       const sheets = event.sheets.filter((s) => s.teamId === team.id && s.categoryId === category.id)
-      const raw = sheets.reduce((sum, s) => sum + s.total, 0)
+      const gross = sheets.reduce((sum, s) => sum + s.total, 0)
+      const catPenalty = event.penalties
+        .filter((p) => p.teamId === team.id && p.categoryId === category.id)
+        .reduce((sum, p) => sum + p.points, 0)
+      const raw = Math.max(0, gross - catPenalty)
       return {
         categoryId: category.id,
         code: category.code,
@@ -69,8 +73,12 @@ export async function getRekap(eventSlug: string) {
         sheetsExpected: category.judges.length,
       }
     })
+    // Total penalti tim (untuk tampilan) & penalti umum (tanpa kategori, mengurangi total).
     const penalty = event.penalties
       .filter((p) => p.teamId === team.id)
+      .reduce((sum, p) => sum + p.points, 0)
+    const generalPenalty = event.penalties
+      .filter((p) => p.teamId === team.id && !p.categoryId)
       .reduce((sum, p) => sum + p.points, 0)
     const totalScore =
       categories
@@ -78,7 +86,7 @@ export async function getRekap(eventSlug: string) {
         .reduce((sum, c) => {
           const cat = event.categories.find((e) => e.id === c.categoryId)
           return sum + c.raw * (cat?.weight ?? 1)
-        }, 0) - penalty
+        }, 0) - generalPenalty
 
     return {
       teamId: team.id,
@@ -190,8 +198,10 @@ export type DetailCategory = {
   name: string
   judges: DetailJudge[]
   groups: DetailGroup[]
-  /** Jumlah nilai seluruh juri kategori ini. */
+  /** Jumlah nilai seluruh juri kategori ini (kotor, sebelum penalti). */
   total: number
+  /** Penalti khusus kategori ini. */
+  penalty: number
 }
 
 /** Rincian nilai per butir (per gerakan) untuk satu tim — untuk transparansi ke peserta. */
@@ -257,10 +267,14 @@ export async function getTeamDetail(eventSlug: string, teamId: string) {
         })),
       })),
       total,
+      penalty: event.penalties
+        .filter((p) => p.categoryId === category.id)
+        .reduce((sum, p) => sum + p.points, 0),
     }
   })
 
   const penalty = event.penalties.reduce((sum, p) => sum + p.points, 0)
+  const generalPenalty = event.penalties.filter((p) => !p.categoryId).reduce((sum, p) => sum + p.points, 0)
 
-  return { event, team, categories, penalty }
+  return { event, team, categories, penalty, generalPenalty, penalties: event.penalties }
 }

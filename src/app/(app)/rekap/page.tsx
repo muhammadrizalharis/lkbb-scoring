@@ -126,6 +126,11 @@ export default async function RekapPage() {
                   <Link href={`/rekap/${t.teamId}`} className="font-medium text-primary underline-offset-2 hover:underline dark:text-blue-300">
                     {t.name}
                   </Link>
+                  {t.penalty > 0 && (
+                    <span className="ml-2 text-xs font-semibold text-red-600" title="Total pengurangan nilai">
+                      −{t.penalty}
+                    </span>
+                  )}
                   {t.overallTied && (
                     <span className="ml-2 rounded bg-danger/20 px-1.5 py-0.5 text-xs font-bold text-red-700 dark:text-red-300">
                       SERI
