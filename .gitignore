@@ -30,8 +30,17 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env — rahasia JANGAN pernah di-commit; hanya template .env.example yang boleh
 .env*
+!.env.example
+
+# kredensial & kunci lain — JANGAN pernah di-commit
+*.key
+*.p12
+*.pfx
+*.pass
+secrets.json
+credentials.json
 
 # vercel
 .vercel
