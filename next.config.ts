@@ -13,6 +13,8 @@ const csp = [
   "form-action 'self'",
   "img-src 'self' data:",
   "font-src 'self'",
+  "manifest-src 'self'",
+  "worker-src 'self'",
   "connect-src 'self'" + (isProd ? "" : " ws:"),
   "style-src 'self' 'unsafe-inline'",
   "script-src 'self' 'unsafe-inline'" + (isProd ? "" : " 'unsafe-eval'"),
