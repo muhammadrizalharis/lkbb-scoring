@@ -1,0 +1,11 @@
+[Unit]
+Description=LKBB Scoring — Backup database (Docker Postgres) mandiri
+Documentation=file:///home/muhammadrizalharis/lkbb-scoring/scripts/db-backup.sh
+After=docker.service
+Wants=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/muhammadrizalharis/lkbb-scoring
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/env bash /home/muhammadrizalharis/lkbb-scoring/scripts/db-backup.sh

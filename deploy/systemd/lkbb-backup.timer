@@ -1,0 +1,12 @@
+[Unit]
+Description=LKBB Scoring — Jadwal backup harian mandiri (03:10)
+
+[Timer]
+# Jadwal MILIK SENDIRI, tidak menumpang cron/resource web lain.
+# DB lokal (Docker) -> aman di-backup harian tanpa kuota.
+OnCalendar=*-*-* 03:10:00
+Persistent=true
+RandomizedDelaySec=120
+
+[Install]
+WantedBy=timers.target

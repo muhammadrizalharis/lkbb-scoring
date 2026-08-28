@@ -14,7 +14,8 @@
     "db:studio": "prisma studio",
     "postinstall": "prisma generate",
     "vercel-build": "bash scripts/vercel-build.sh",
-    "demo": "tsx scripts/demo-data.ts"
+    "demo": "tsx scripts/demo-data.ts",
+    "users": "tsx scripts/users.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

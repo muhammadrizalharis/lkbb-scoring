@@ -206,7 +206,37 @@ cukup PostgreSQL lokal.
 
 <br/>
 
-## 📄 Lisensi
+## � Backup & pemulihan
+
+Database berjalan di **Docker Postgres 18** (`127.0.0.1:5436`) dengan backup **mandiri** —
+jadwal dan penyimpanan sendiri, tidak menumpang layanan lain.
+
+**Backup otomatis harian** lewat `systemd --user` timer (`lkbb-backup.timer`, ~03:10),
+menyimpan 30 dump terakhir di folder `backups/`:
+
+```bash
+scripts/db-backup.sh                              # backup manual sekarang
+systemctl --user list-timers lkbb-backup.timer   # lihat jadwal berikutnya
+```
+
+**Pulihkan seluruh database** dari sebuah dump:
+
+```bash
+scripts/db-restore.sh backups/lkbb-YYYYMMDD-HHMMSS.dump
+```
+
+**Pemulihan akun — tanpa backup sekalipun.** Menghapus akun bersifat *soft delete*:
+akun dinonaktifkan tetapi datanya tetap tersimpan. Super Admin memulihkannya lewat
+**Kelola Akun → Akun terhapus → Pulihkan**. Developer juga bisa dari terminal:
+
+```bash
+npm run users -- list                 # semua akun (aktif + terhapus)
+npm run users -- restore <username>   # aktifkan kembali akun
+```
+
+<br/>
+
+## �📄 Lisensi
 
 Dirilis di bawah lisensi [MIT](LICENSE) — bebas dipakai, ubah, dan sebarkan.
 

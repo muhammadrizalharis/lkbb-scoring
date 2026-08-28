@@ -35,10 +35,38 @@ export async function addUserAction(_prev: UserState, formData: FormData): Promi
   })
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Data tidak valid.' }
 
-  const exists = await prisma.user.findUnique({ where: { username: parsed.data.username } })
-  if (exists) return { error: `Username "${parsed.data.username}" sudah dipakai.` }
-
   const passwordHash = await bcrypt.hash(parsed.data.password, 12)
+  const exists = await prisma.user.findUnique({ where: { username: parsed.data.username } })
+
+  if (exists && !exists.deletedAt) {
+    return { error: `Username "${parsed.data.username}" sudah dipakai.` }
+  }
+
+  // Username milik akun yang pernah dihapus (soft delete) -> aktifkan kembali
+  // dengan data terbaru, alih-alih menolak. Data lama otomatis pulih.
+  if (exists && exists.deletedAt) {
+    const user = await prisma.user.update({
+      where: { id: exists.id },
+      data: {
+        name: parsed.data.name,
+        passwordHash,
+        role: parsed.data.role,
+        deletedAt: null,
+      },
+    })
+    await prisma.auditLog.create({
+      data: {
+        userId: session.userId,
+        action: 'RESTORE_USER',
+        entity: 'User',
+        entityId: user.id,
+        detail: { username: user.username, role: user.role, reactivated: true },
+      },
+    })
+    revalidatePath('/admin/pengguna')
+    return { ok: true, message: `Akun "${user.username}" diaktifkan kembali (${user.role.toLowerCase()}).` }
+  }
+
   const user = await prisma.user.create({
     data: {
       username: parsed.data.username,
@@ -67,15 +95,38 @@ export async function deleteUserAction(formData: FormData) {
   if (!id || id === session.userId) return // tak boleh hapus diri sendiri
 
   const target = await prisma.user.findUnique({ where: { id } })
-  if (!target) return
+  if (!target || target.deletedAt) return
   if (target.role === 'SUPER_ADMIN') {
-    const supers = await prisma.user.count({ where: { role: 'SUPER_ADMIN' } })
-    if (supers <= 1) return // jangan hapus super admin terakhir
+    const supers = await prisma.user.count({ where: { role: 'SUPER_ADMIN', deletedAt: null } })
+    if (supers <= 1) return // jangan hapus super admin (aktif) terakhir
   }
 
-  await prisma.user.delete({ where: { id } })
+  // Soft delete: tandai terhapus, data TETAP tersimpan sehingga bisa dipulihkan
+  // (oleh Super Admin lewat tombol Pulihkan, atau developer lewat skrip) walau tanpa backup.
+  await prisma.user.update({ where: { id }, data: { deletedAt: new Date() } })
   await prisma.auditLog.create({
     data: { userId: session.userId, action: 'DELETE_USER', entity: 'User', entityId: id },
+  })
+  revalidatePath('/admin/pengguna')
+}
+
+export async function restoreUserAction(formData: FormData) {
+  const session = await requireMinRole('SUPER_ADMIN')
+  const id = String(formData.get('id') ?? '')
+  if (!id) return
+
+  const target = await prisma.user.findUnique({ where: { id } })
+  if (!target || !target.deletedAt) return // hanya yang benar-benar terhapus
+
+  await prisma.user.update({ where: { id }, data: { deletedAt: null } })
+  await prisma.auditLog.create({
+    data: {
+      userId: session.userId,
+      action: 'RESTORE_USER',
+      entity: 'User',
+      entityId: id,
+      detail: { username: target.username, role: target.role },
+    },
   })
   revalidatePath('/admin/pengguna')
 }

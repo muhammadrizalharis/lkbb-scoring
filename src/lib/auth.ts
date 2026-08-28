@@ -48,7 +48,10 @@ export async function destroySession() {
 
 /** Dedup lookup user dalam satu request (React cache). */
 const loadUser = cache((id: string) =>
-  prisma.user.findUnique({ where: { id }, select: { id: true, username: true, name: true, role: true } }),
+  prisma.user.findUnique({
+    where: { id },
+    select: { id: true, username: true, name: true, role: true, deletedAt: true },
+  }),
 )
 
 export async function getSession(): Promise<Session | null> {
@@ -56,9 +59,10 @@ export async function getSession(): Promise<Session | null> {
   if (!token) return null
   try {
     const { payload } = await jwtVerify(token, secret(), { algorithms: ['HS256'] })
-    // Verifikasi ke DB: sesi batal bila akun dihapus; peran & nama selalu yang terbaru.
+    // Verifikasi ke DB: sesi batal bila akun dihapus (soft delete) atau tak ada;
+    // peran & nama selalu mengikuti data terbaru.
     const user = await loadUser(String(payload.userId))
-    if (!user) return null
+    if (!user || user.deletedAt) return null
     return { userId: user.id, username: user.username, name: user.name, role: user.role as Role }
   } catch {
     return null
@@ -105,6 +109,7 @@ export async function verifyCredentials(username: string, password: string) {
   // Tetap jalankan bcrypt saat user tidak ada agar waktu respons seragam.
   const hash = user?.passwordHash ?? '$2b$12$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalidin'
   const ok = await bcrypt.compare(password, hash)
-  if (!user || !ok) return null
+  // Akun yang sudah dihapus (soft delete) tidak boleh bisa login.
+  if (!user || user.deletedAt || !ok) return null
   return user
 }

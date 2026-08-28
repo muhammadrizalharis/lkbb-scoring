@@ -26,6 +26,8 @@ model User {
   passwordHash String
   role         Role     @default(OPERATOR)
   createdAt    DateTime @default(now())
+  /// Soft delete: null = aktif; terisi = "dihapus" tapi data tetap tersimpan (bisa dipulihkan).
+  deletedAt    DateTime?
 
   sheets    ScoreSheet[]
   auditLogs AuditLog[]
