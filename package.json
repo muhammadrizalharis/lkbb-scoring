@@ -15,7 +15,8 @@
     "postinstall": "prisma generate",
     "vercel-build": "bash scripts/vercel-build.sh",
     "demo": "tsx scripts/demo-data.ts",
-    "users": "tsx scripts/users.ts"
+    "users": "tsx scripts/users.ts",
+    "lomba": "tsx scripts/lomba.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

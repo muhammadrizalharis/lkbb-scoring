@@ -68,9 +68,10 @@ export default async function ResetPage() {
           <div>
             <h2 className="font-semibold text-danger">Zona berbahaya</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Tindakan ini <b>menghapus permanen</b> semua tim, juri, lembar nilai, dan penalti pada
-              event ini. <b>Rubrik (format penilaian) dan akun pengguna tetap aman.</b> Aksi tidak bisa
-              dibatalkan.
+              Tindakan ini <b>menghapus</b> semua tim, juri, lembar nilai, dan penalti pada event
+              ini. <b>Rubrik (format penilaian) dan akun pengguna tetap aman.</b> Sebelum dihapus,
+              seluruh data <b>disnapshot otomatis</b> sehingga developer masih bisa memulihkannya
+              bila diperlukan.
             </p>
           </div>
         </div>

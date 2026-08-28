@@ -229,3 +229,26 @@ model AuditLog {
 
   @@index([createdAt])
 }
+
+/// Cadangan otomatis data lomba sebelum di-reset super admin. Independen (tanpa relasi
+/// cascade) agar TIDAK ikut terhapus saat reset, sehingga developer bisa memulihkan
+/// tim/juri/lembar nilai/penalti walau tidak ada backup eksternal.
+model EventDataSnapshot {
+  id          String  @id @default(cuid())
+  eventId     String
+  createdById String?
+  reason      String  @default("reset")
+
+  teamCount    Int
+  judgeCount   Int
+  sheetCount   Int
+  itemCount    Int
+  penaltyCount Int
+
+  /// Salinan lengkap data lomba (tim, juri, lembar, butir, penalti) sebagai JSON.
+  payload Json
+
+  createdAt DateTime @default(now())
+
+  @@index([eventId, createdAt])
+}
