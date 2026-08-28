@@ -21,11 +21,18 @@ export default async function LivePage() {
   const categories = event.categories
   // Urut berdasarkan NOMOR URUT tampil (bukan peringkat).
   const teams = [...data.teams].sort((a, b) => a.number - b.number)
+  // Nilai hanya terbuka saat mode LIVE; sebelum itu semua tampil 0.
+  const live = event.liveMode
 
   return (
     <div className="fixed inset-0 flex flex-col overflow-hidden bg-background">
       <AutoRefresh />
       <PublicHeader name={event.name} host={event.host} liveMode={event.liveMode} />
+      {!live && (
+        <div className="border-b border-border/60 bg-muted/40 px-4 py-1.5 text-center text-xs text-muted-foreground">
+          Nilai akan ditampilkan saat lomba disiarkan langsung (status LIVE).
+        </div>
+      )}
 
       {teams.length === 0 ? (
         <div className="flex flex-1 items-center justify-center p-6 text-center text-muted-foreground">
@@ -58,8 +65,8 @@ export default async function LivePage() {
                     {categories.map((c) => {
                       const cell = t.categories.find((x) => x.categoryId === c.id)
                       return (
-                        <td key={c.id} className="px-3 py-4 text-center text-xl font-bold tabular-nums">
-                          {cell?.raw ?? 0}
+                        <td key={c.id} className={`px-3 py-4 text-center text-xl font-bold tabular-nums ${live ? '' : 'text-muted-foreground/50'}`}>
+                          {live ? (cell?.raw ?? 0) : 0}
                         </td>
                       )
                     })}
