@@ -42,6 +42,10 @@ yarn-error.log*
 secrets.json
 credentials.json
 
+# backup database (jangan commit dump)
+/backups/
+*.dump
+
 # vercel
 .vercel
 

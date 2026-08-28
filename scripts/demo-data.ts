@@ -44,6 +44,11 @@ const TEAMS = [
   'Paskibra MAN 1 Polewali',
   'Paskibra SMAN 1 Kalukku',
   'Paskibra SMKN 1 Campalagian',
+  'Paskibra SMAN 2 Tinambung',
+  'Paskibra SMKN 1 Majene',
+  'Paskibra SMAN 6 Polewali',
+  'Paskibra MAN 2 Majene',
+  'Paskibra SMAN 1 Binuang',
 ]
 
 async function main() {

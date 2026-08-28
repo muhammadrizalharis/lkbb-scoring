@@ -1,0 +1,26 @@
+# Database khusus Paskitactical (lkbb) — TERISOLASI, tidak menumpang instance lain.
+# Password diambil dari .env (LKBB_DB_PASSWORD) — TIDAK ditulis di file ini.
+services:
+  db:
+    image: postgres:18-alpine
+    container_name: lkbb-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lkbb
+      POSTGRES_PASSWORD: ${LKBB_DB_PASSWORD:?set LKBB_DB_PASSWORD di .env}
+      POSTGRES_DB: lkbb
+    ports:
+      # Hanya localhost — diakses app di host (dan tunnel ngrok), bukan publik.
+      - "127.0.0.1:5436:5432"
+    volumes:
+      # PG 18: mount di /var/lib/postgresql (data ditaruh di subdir versi otomatis).
+      - lkbb-pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lkbb -d lkbb"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  lkbb-pgdata:
+    name: lkbb-pgdata

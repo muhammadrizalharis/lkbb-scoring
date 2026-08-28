@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { EVENT_SLUG } from '@/lib/config'
 import { getSession, hasAtLeast } from '@/lib/auth'
@@ -14,7 +14,7 @@ const NAV: NavItem[] = [
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession()
-  if (!session) redirect('/login')
+  if (!session) notFound()
 
   const event = await prisma.event.findUnique({
     where: { slug: EVENT_SLUG },
