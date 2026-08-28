@@ -40,7 +40,7 @@ export function ScoreForm({
   const missing = criteria.length - filled
 
   return (
-    <form action={formAction} className="space-y-5 pb-28">
+    <form action={formAction} className="space-y-5 pb-40 sm:pb-28">
       <input type="hidden" name="teamId" value={teamId} />
       <input type="hidden" name="judgeId" value={judgeId} />
       {Object.entries(values).map(([id, value]) => (
@@ -107,8 +107,8 @@ export function ScoreForm({
       ))}
 
       <div className="fixed inset-x-0 bottom-0 border-t border-border bg-card/90 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3">
-          <div className="flex-1">
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+          <div className="min-w-0 flex-1">
             <p className="text-2xl font-black tabular-nums">
               {total}
               <span className="ml-1 text-sm font-normal text-muted-foreground">/ {maxScore}</span>
@@ -131,29 +131,33 @@ export function ScoreForm({
               🔒 Terkunci — sudah difinalkan{enteredBy ? ` oleh ${enteredBy}` : ''}. Hubungi admin untuk koreksi.
             </p>
           ) : (
-            <>
-              {state.error && <p className="text-sm font-medium text-red-600">{state.error}</p>}
-              {state.ok && !state.error && <p className="text-sm font-medium text-emerald-600">Tersimpan.</p>}
-
-              <button
-                type="submit"
-                name="finalize"
-                value="0"
-                disabled={pending}
-                className="rounded-xl border border-input bg-card px-4 py-2.5 font-semibold transition hover:bg-accent disabled:opacity-50"
-              >
-                Simpan draf
-              </button>
-              <button
-                type="submit"
-                name="finalize"
-                value="1"
-                disabled={pending || missing > 0}
-                className="rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 px-5 py-2.5 font-semibold text-white shadow-lg shadow-emerald-600/25 transition hover:opacity-95 disabled:opacity-40 disabled:shadow-none"
-              >
-                {pending ? 'Menyimpan…' : 'Simpan & Finalkan'}
-              </button>
-            </>
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+              {state.error ? (
+                <p className="text-sm font-medium text-red-600">{state.error}</p>
+              ) : state.ok ? (
+                <p className="text-sm font-medium text-emerald-600">Tersimpan.</p>
+              ) : null}
+              <div className="flex gap-2">
+                <button
+                  type="submit"
+                  name="finalize"
+                  value="0"
+                  disabled={pending}
+                  className="flex-1 rounded-xl border border-input bg-card px-4 py-2.5 font-semibold transition hover:bg-accent disabled:opacity-50 sm:flex-none"
+                >
+                  Simpan draf
+                </button>
+                <button
+                  type="submit"
+                  name="finalize"
+                  value="1"
+                  disabled={pending || missing > 0}
+                  className="flex-1 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 px-5 py-2.5 font-semibold text-white shadow-lg shadow-emerald-600/25 transition hover:opacity-95 disabled:opacity-40 disabled:shadow-none sm:flex-none"
+                >
+                  {pending ? 'Menyimpan…' : 'Simpan & Finalkan'}
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>

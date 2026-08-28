@@ -4,9 +4,7 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { EVENT_SLUG } from '@/lib/config'
 import { getSession, hasAtLeast } from '@/lib/auth'
-import { logoutAction } from '../login/actions'
-import { NavLinks, type NavItem } from './NavLinks'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { HeaderNav, type NavItem } from './HeaderNav'
 
 const NAV: NavItem[] = [
   { href: '/beranda', label: 'Beranda' },
@@ -54,22 +52,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </span>
           </Link>
 
-          <NavLinks items={nav} />
-
-          <div className="flex items-center gap-3">
-            <div className="hidden text-right sm:block">
-              <p className="text-sm font-semibold leading-tight">{session.name}</p>
-              <p className="text-[11px] font-medium text-primary dark:text-blue-300">
-                {roleLabel[session.role] ?? session.role}
-              </p>
-            </div>
-            <ThemeToggle />
-            <form action={logoutAction}>
-              <button className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-medium text-muted-foreground transition hover:border-danger/40 hover:text-danger">
-                Keluar
-              </button>
-            </form>
-          </div>
+          <HeaderNav
+            nav={nav}
+            userName={session.name}
+            roleLabel={roleLabel[session.role] ?? session.role}
+          />
         </div>
         {event && (
           <div
