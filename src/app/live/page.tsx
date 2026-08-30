@@ -1,5 +1,5 @@
 import { EVENT_SLUG } from '@/lib/config'
-import { getRekap } from '@/lib/scoring'
+import { getLiveBoard } from '@/lib/live-board'
 import { AutoRefresh } from './AutoRefresh'
 import { AutoScroll } from './AutoScroll'
 import { PublicHeader } from './PublicHeader'
@@ -7,7 +7,7 @@ import { PublicHeader } from './PublicHeader'
 export const dynamic = 'force-dynamic'
 
 export default async function LivePage() {
-  const data = await getRekap(EVENT_SLUG)
+  const data = await getLiveBoard(EVENT_SLUG)
 
   if (!data) {
     return (

@@ -35,7 +35,17 @@ const nextConfig: NextConfig = {
   // Bundel mandiri (server.js + node_modules terpilih) untuk image Docker ramping.
   output: "standalone",
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      // Papan publik boleh di-cache CDN (Cloudflare) ~1 dtk → ratusan penonton
+      // di-serve dari edge, origin cukup me-render ~1x/dtk. Tanpa CDN: tak berefek.
+      {
+        source: "/live",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=0, s-maxage=1, stale-while-revalidate=5" },
+        ],
+      },
+    ];
   },
 };
 
