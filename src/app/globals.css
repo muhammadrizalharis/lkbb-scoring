@@ -7,9 +7,10 @@
    (jalan di semua gadget termasuk iOS) dan TETAP jalan walau rotation-lock HP aktif:
    konten diputar 90°, jadi begitu HP diputar fisik ke samping, papan tampil tegak & lega.
    Saat viewport benar-benar landscape (auto-rotate aktif), media query ini tak cocok →
-   rotasi lepas → papan tampil natural. Hanya untuk layar kecil (HP), bukan tablet/desktop. */
+   rotasi lepas → papan tampil natural. Hanya untuk layar kecil (HP), bukan tablet/desktop.
+   Bisa dimatikan lewat toggle (data-live-orient="portrait" pada <html>). Default = landscape. */
 @media (max-width: 767px) and (orientation: portrait) {
-  .live-force-landscape {
+  html:not([data-live-orient="portrait"]) .live-force-landscape {
     position: fixed;
     inset: auto;
     top: 0;

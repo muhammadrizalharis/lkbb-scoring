@@ -26,6 +26,12 @@ export default async function LivePage() {
 
   return (
     <div className="live-force-landscape fixed inset-0 flex flex-col overflow-hidden bg-background">
+      {/* Terapkan preferensi orientasi sebelum paint agar tak ada kedipan landscape→potret. */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `try{if(localStorage.getItem('lkbb_live_orient')==='portrait')document.documentElement.setAttribute('data-live-orient','portrait')}catch(e){}`,
+        }}
+      />
       <AutoRefresh intervalMs={live ? 1200 : 4000} />
       <PublicHeader name={event.name} host={event.host} liveMode={event.liveMode} />
       {teams.length === 0 ? (

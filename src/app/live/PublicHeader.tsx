@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { OrientationToggle } from './OrientationToggle'
 
 export function PublicHeader({
   name,
@@ -36,6 +37,8 @@ export function PublicHeader({
           </span>
           {host && <span className="text-xs text-muted-foreground">{host}</span>}
         </div>
+
+        <OrientationToggle />
 
         {backHref && (
           <Link href={backHref} className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-medium text-muted-foreground transition hover:bg-accent">
