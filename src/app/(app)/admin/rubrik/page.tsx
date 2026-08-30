@@ -4,7 +4,8 @@ import { prisma } from '@/lib/db'
 import { getSession, hasAtLeast } from '@/lib/auth'
 import { EVENT_SLUG } from '@/lib/config'
 import { RubricForm, Field } from './RubricForm'
-import { createCategoryAction, deleteCategoryAction, moveCategoryAction, setPublishedAction } from './actions'
+import { PublishButton } from './PublishButton'
+import { createCategoryAction, deleteCategoryAction, moveCategoryAction } from './actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -70,18 +71,7 @@ export default async function RubricPage() {
             </p>
           </div>
         </div>
-        <form action={setPublishedAction}>
-          <input type="hidden" name="published" value={published ? '0' : '1'} />
-          <button
-            className={`rounded-xl px-5 py-2.5 font-semibold text-white shadow-lg transition hover:opacity-95 ${
-              published
-                ? 'bg-gradient-to-br from-amber-500 to-orange-600 shadow-orange-600/25'
-                : 'bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-emerald-600/25'
-            }`}
-          >
-            {published ? 'Batalkan publish' : 'Publish untuk lomba'}
-          </button>
-        </form>
+        <PublishButton published={published} />
       </div>
 
       <div className={`rounded-xl bg-card p-5 shadow-sm ring-1 ring-border ${published ? 'opacity-60' : ''}`}>

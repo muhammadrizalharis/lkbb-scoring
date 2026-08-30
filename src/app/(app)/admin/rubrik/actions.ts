@@ -457,10 +457,24 @@ export async function moveCriterionAction(formData: FormData) {
 }
 
 /** Publish/unpublish lomba: mengunci/membuka rubrik. Khusus super admin. */
-export async function setPublishedAction(formData: FormData) {
+export type PublishState = { ok?: boolean; error?: string }
+
+export async function setPublishedAction(_prev: PublishState, formData: FormData): Promise<PublishState> {
   await requireMinRole('SUPER_ADMIN')
-  const published = formData.get('published') === '1'
-  await prisma.event.update({ where: { slug: EVENT_SLUG }, data: { published } })
+  const publish = formData.get('published') === '1'
+
+  // Wajib Live dulu sebelum publish: tak boleh mengunci lomba yang belum disiarkan.
+  if (publish) {
+    const ev = await prisma.event.findUnique({ where: { slug: EVENT_SLUG }, select: { liveMode: true } })
+    if (!ev?.liveMode) {
+      return {
+        error: 'Lomba belum di-Live-kan. Aktifkan "Live score" dulu di Pengaturan → Event, baru bisa publish.',
+      }
+    }
+  }
+
+  await prisma.event.update({ where: { slug: EVENT_SLUG }, data: { published: publish } })
   revalidatePath('/admin/rubrik')
   revalidatePath('/admin')
+  return { ok: true }
 }

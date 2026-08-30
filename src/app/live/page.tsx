@@ -28,13 +28,25 @@ export default async function LivePage() {
     <div className="fixed inset-0 flex flex-col overflow-hidden bg-background">
       <AutoRefresh intervalMs={live ? 1200 : 4000} />
       <PublicHeader name={event.name} host={event.host} liveMode={event.liveMode} />
-      {!live && (
-        <div className="border-b border-border/60 bg-muted/40 px-4 py-1.5 text-center text-xs text-muted-foreground">
-          Nilai akan ditampilkan saat lomba disiarkan langsung (status LIVE).
+      {!live ? (
+        <div className="flex flex-1 items-center justify-center p-6 text-center">
+          <div className="max-w-md">
+            <span className="mx-auto mb-4 grid size-16 place-items-center rounded-2xl bg-muted text-muted-foreground">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="size-8">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z" />
+                <circle cx="12" cy="12" r="3" />
+                <line x1="3" y1="3" x2="21" y2="21" />
+              </svg>
+            </span>
+            <p className="text-lg font-bold sm:text-2xl">
+              &ldquo;{event.name}&rdquo; belum melakukan live score
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground sm:text-base">
+              Papan skor tampil otomatis begitu panitia mengaktifkan Live. Halaman ini memperbarui sendiri.
+            </p>
+          </div>
         </div>
-      )}
-
-      {teams.length === 0 ? (
+      ) : teams.length === 0 ? (
         <div className="flex flex-1 items-center justify-center p-6 text-center text-muted-foreground">
           Belum ada data peserta.
         </div>
@@ -69,8 +81,8 @@ export default async function LivePage() {
                     {categories.map((c) => {
                       const cell = t.categories.find((x) => x.categoryId === c.id)
                       return (
-                        <td key={c.id} className={`px-0.5 py-2 text-center text-xs font-bold tabular-nums sm:px-3 sm:py-3 sm:text-base lg:text-lg xl:py-4 xl:text-xl ${live ? '' : 'text-muted-foreground/50'}`}>
-                          {live ? (cell?.raw ?? 0) : 0}
+                        <td key={c.id} className="px-0.5 py-2 text-center text-xs font-bold tabular-nums sm:px-3 sm:py-3 sm:text-base lg:text-lg xl:py-4 xl:text-xl">
+                          {cell?.raw ?? 0}
                         </td>
                       )
                     })}
