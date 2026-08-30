@@ -218,6 +218,20 @@ docker compose restart tunnel      # nyalakan ulang tunnel
 
 Tanpa database cloud — cukup PostgreSQL lokal di dalam kontainer.
 
+### Tunnel publik: ngrok (tes) → Cloudflare (produksi)
+
+Provider tunnel dipilih lewat satu variabel `COMPOSE_PROFILES` di `.env` — **tanpa ubah kode**:
+
+- **Sekarang (tes):** `COMPOSE_PROFILES=ngrok` + `NGROK_DOMAIN` + `NGROK_AUTHTOKEN`.
+- **Nanti (produksi, domain sendiri + CDN):**
+  1. Beli domain, tambahkan ke **Cloudflare** (plan Free cukup).
+  2. Buat **Tunnel** di Cloudflare Zero Trust → set _public hostname_ domain → service `http://app:3000` → salin **token**.
+  3. Di `.env`: isi `CLOUDFLARE_TUNNEL_TOKEN` dan ubah `COMPOSE_PROFILES=cloudflare`.
+  4. `docker compose up -d` → ngrok berhenti, `cloudflared` jalan. Selesai.
+
+Header cache papan sudah disiapkan (`s-maxage`), jadi begitu di belakang Cloudflare, `/live`
+otomatis di-cache di edge (~1 dtk) → kuat menampung ratusan penonton serentak.
+
 <br/>
 
 ## 💾 Backup & pemulihan

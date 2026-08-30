@@ -47,19 +47,37 @@ services:
       retries: 5
       start_period: 25s
 
-  # Tunnel publik ngrok → app (domain statis Free). Menggantikan lkbb-tunnel.service.
+  # --- TUNNEL PUBLIK (bisa diganti TANPA ubah kode) ---
+  # Pilih provider lewat COMPOSE_PROFILES di .env: "ngrok" (tes sekarang) / "cloudflare" (produksi).
+  #
+  # ngrok Free — untuk tes & pengembangan sekarang.
   tunnel:
     image: ngrok/ngrok:latest
     container_name: lkbb-tunnel
+    profiles: ["ngrok"]
     restart: unless-stopped
     command:
       - "http"
       - "app:3000"
-      - "--domain=euphemism-hydroxide-caution.ngrok-free.dev"
+      - "--domain=${NGROK_DOMAIN:?set NGROK_DOMAIN di .env}"
       - "--log=stdout"
       - "--log-format=logfmt"
     environment:
       NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN:?set NGROK_AUTHTOKEN di .env}
+    depends_on:
+      app:
+        condition: service_healthy
+
+  # Cloudflare Tunnel — untuk PRODUKSI nanti (domain paskitactical.my.id + CDN edge cache).
+  # Cara pindah nanti (tanpa ubah kode): beli domain → tambahkan ke Cloudflare → buat Tunnel di
+  # dashboard Zero Trust, set Public Hostname domain → service http://app:3000 → salin token ke
+  # .env (CLOUDFLARE_TUNNEL_TOKEN) → ubah COMPOSE_PROFILES=cloudflare → `docker compose up -d`.
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: lkbb-cloudflared
+    profiles: ["cloudflare"]
+    restart: unless-stopped
+    command: ["tunnel", "--no-autoupdate", "run", "--token", "${CLOUDFLARE_TUNNEL_TOKEN:-}"]
     depends_on:
       app:
         condition: service_healthy
