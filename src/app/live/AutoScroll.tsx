@@ -5,9 +5,13 @@ import { useEffect, useRef, type ReactNode } from 'react'
 /**
  * Papan skor gulir-otomatis ala CAT/CPNS: konten bergulir turun perlahan, jeda di
  * bawah, lalu kembali ke atas — terus-menerus selama live. Berlaku SAMA di HP maupun
- * desktop; pengguna TIDAK bisa menggulir manual (overflow terkunci). Berhenti otomatis
- * saat halaman tak terlihat (layar mati / tab di latar) demi hemat baterai, lanjut lagi
- * begitu terlihat.
+ * desktop.
+ *
+ * Penting lintas-perangkat: memakai kontainer yang BENAR-BENAR scrollable
+ * (overflow-y: scroll, scrollbar disembunyikan) karena iOS/Android MENGABAIKAN
+ * `scrollTop` programatik pada elemen `overflow: hidden`. Gulir MANUAL diblokir
+ * (touch-action none + cegah touchmove/wheel) supaya pengguna tetap tak bisa
+ * menggulir sendiri. Berhenti saat halaman tak terlihat demi hemat baterai.
  */
 export function AutoScroll({
   children,
@@ -64,19 +68,30 @@ export function AutoScroll({
     }
     // Hemat baterai: hanya bergulir saat halaman benar-benar terlihat.
     const onVisibility = () => (document.hidden ? stop() : start())
+    // Blokir gulir MANUAL (sentuh & roda) — gulir programatik tetap jalan.
+    const blockManual = (e: Event) => e.preventDefault()
 
+    el.addEventListener('touchmove', blockManual, { passive: false })
+    el.addEventListener('wheel', blockManual, { passive: false })
     document.addEventListener('visibilitychange', onVisibility)
     if (!document.hidden) start()
 
     return () => {
       stop()
+      el.removeEventListener('touchmove', blockManual)
+      el.removeEventListener('wheel', blockManual)
       document.removeEventListener('visibilitychange', onVisibility)
     }
   }, [speed, pauseMs])
 
   return (
-    <div ref={ref} className="min-h-0 flex-1 overflow-hidden overscroll-none">
+    <div
+      ref={ref}
+      style={{ touchAction: 'none' }}
+      className="min-h-0 flex-1 overflow-x-hidden overflow-y-scroll overscroll-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    >
       {children}
     </div>
   )
 }
+
