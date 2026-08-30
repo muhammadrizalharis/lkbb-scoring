@@ -28,30 +28,13 @@ export default async function LivePage() {
     <div className="fixed inset-0 flex flex-col overflow-hidden bg-background">
       <AutoRefresh intervalMs={live ? 1200 : 4000} />
       <PublicHeader name={event.name} host={event.host} liveMode={event.liveMode} />
-      {!live ? (
-        <div className="flex flex-1 items-center justify-center p-6 text-center">
-          <div className="max-w-md">
-            <span className="mx-auto mb-4 grid size-16 place-items-center rounded-2xl bg-muted text-muted-foreground">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="size-8">
-                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z" />
-                <circle cx="12" cy="12" r="3" />
-                <line x1="3" y1="3" x2="21" y2="21" />
-              </svg>
-            </span>
-            <p className="text-lg font-bold sm:text-2xl">
-              &ldquo;{event.name}&rdquo; belum melakukan live score
-            </p>
-            <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-              Papan skor tampil otomatis begitu panitia mengaktifkan Live. Halaman ini memperbarui sendiri.
-            </p>
-          </div>
-        </div>
-      ) : teams.length === 0 ? (
+      {teams.length === 0 ? (
         <div className="flex flex-1 items-center justify-center p-6 text-center text-muted-foreground">
           Belum ada data peserta.
         </div>
       ) : (
-        <AutoScroll>
+        <div className="relative flex min-h-0 flex-1 flex-col">
+          <AutoScroll>
           <div className="mx-auto w-full max-w-[110rem] px-1 sm:px-4 lg:px-8">
             <table className="w-full border-collapse">
               <thead className="sticky top-0 z-10 bg-card/95 backdrop-blur">
@@ -81,8 +64,8 @@ export default async function LivePage() {
                     {categories.map((c) => {
                       const cell = t.categories.find((x) => x.categoryId === c.id)
                       return (
-                        <td key={c.id} className="px-0.5 py-2 text-center text-xs font-bold tabular-nums sm:px-3 sm:py-3 sm:text-base lg:text-lg xl:py-4 xl:text-xl">
-                          {cell?.raw ?? 0}
+                        <td key={c.id} className={`px-0.5 py-2 text-center text-xs font-bold tabular-nums sm:px-3 sm:py-3 sm:text-base lg:text-lg xl:py-4 xl:text-xl ${live ? '' : 'text-muted-foreground/40'}`}>
+                          {live ? (cell?.raw ?? 0) : 0}
                         </td>
                       )
                     })}
@@ -91,7 +74,27 @@ export default async function LivePage() {
               </tbody>
             </table>
           </div>
-        </AutoScroll>
+          </AutoScroll>
+          {!live && (
+            <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-background/75 p-6 text-center">
+              <div className="max-w-md rounded-2xl bg-card px-6 py-5 shadow-2xl ring-1 ring-border">
+                <span className="mx-auto mb-3 grid size-14 place-items-center rounded-2xl bg-red-500/10 text-red-600 dark:text-red-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="size-7">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z" />
+                    <circle cx="12" cy="12" r="3" />
+                    <line x1="3" y1="3" x2="21" y2="21" />
+                  </svg>
+                </span>
+                <p className="text-lg font-bold sm:text-2xl">
+                  &ldquo;{event.name}&rdquo; belum melakukan live score
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Papan akan aktif otomatis begitu panitia menyalakan Mode LIVE.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       )}
     </div>
   )
