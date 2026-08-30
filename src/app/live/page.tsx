@@ -28,6 +28,15 @@ export default async function LivePage() {
     <div className="fixed inset-0 flex flex-col overflow-hidden bg-background">
       <AutoRefresh intervalMs={live ? 1200 : 4000} />
       <PublicHeader name={event.name} host={event.host} liveMode={event.liveMode} />
+      {live && (
+        <div className="hidden items-center justify-center gap-1.5 border-b border-border/60 bg-primary/5 px-3 py-1 text-center text-[11px] font-medium text-muted-foreground max-md:portrait:flex">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-3.5 shrink-0">
+            <path d="M23 4v6h-6" />
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+          </svg>
+          Putar HP ke posisi landscape agar semua kolom terlihat lebih lega
+        </div>
+      )}
       {teams.length === 0 ? (
         <div className="flex flex-1 items-center justify-center p-6 text-center text-muted-foreground">
           Belum ada data peserta.
@@ -36,13 +45,20 @@ export default async function LivePage() {
         <div className="relative flex min-h-0 flex-1 flex-col">
           <AutoScroll>
           <div className="mx-auto w-full max-w-[110rem] px-1 sm:px-4 lg:px-8">
-            <table className="w-full border-collapse">
+            <table className="w-full table-fixed border-collapse">
+              <colgroup>
+                <col className="w-8 sm:w-14 xl:w-20" />
+                <col className="w-[32%] sm:w-[30%] lg:w-[24%]" />
+                {categories.map((c) => (
+                  <col key={c.id} />
+                ))}
+              </colgroup>
               <thead className="sticky top-0 z-10 bg-card/95 backdrop-blur">
                 <tr className="border-b border-border text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground sm:text-xs sm:tracking-wider">
                   <th className="px-1.5 py-2.5 text-center sm:px-4 sm:py-3 xl:py-4">No</th>
                   <th className="px-1.5 py-2.5 sm:px-4 sm:py-3 xl:py-4">Tim</th>
                   {categories.map((c) => (
-                    <th key={c.id} className="px-0.5 py-2.5 text-center whitespace-nowrap sm:px-3 sm:py-3 xl:py-4" title={c.name}>
+                    <th key={c.id} className="truncate px-0.5 py-2.5 text-center sm:px-3 sm:py-3 xl:py-4" title={c.name}>
                       {c.code}
                     </th>
                   ))}
@@ -57,7 +73,7 @@ export default async function LivePage() {
                       </span>
                     </td>
                     <td className="px-1.5 py-2 sm:px-4 sm:py-3 xl:py-4">
-                      <span className="block max-w-[34vw] truncate text-xs font-semibold sm:max-w-[52vw] sm:text-base lg:max-w-none lg:text-lg xl:text-xl">
+                      <span className="block truncate text-xs font-semibold sm:text-base lg:text-lg xl:text-xl">
                         {t.name}
                       </span>
                     </td>
