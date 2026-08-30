@@ -28,42 +28,49 @@ export function AutoScroll({
     const el = ref.current
     if (!el) return
 
-    let prev = performance.now()
-    let hold = pauseMs // jeda awal di atas
+    let raf = 0
+    let prev = 0
+    // Akumulator posisi FLOAT — kunci lintas-HP: jangan baca-ulang el.scrollTop yang
+    // dibulatkan ke integer di mobile (increment sub-pixel ~0,4px/frame akan hilang → mentok).
+    let pos = 0
+    let hold = pauseMs
     let atBottom = false
-    let id: ReturnType<typeof setInterval> | null = null
 
-    const step = () => {
-      const now = performance.now()
+    const frame = (now: number) => {
+      if (!prev) prev = now
       const dt = Math.min(now - prev, 100)
       prev = now
       const max = el.scrollHeight - el.clientHeight
-      if (max <= 4) return
 
-      if (hold > 0) {
-        hold -= dt
-        if (hold <= 0 && atBottom) {
-          el.scrollTop = 0
-          atBottom = false
+      if (max > 4) {
+        if (hold > 0) {
+          hold -= dt
+          if (hold <= 0 && atBottom) {
+            pos = 0
+            atBottom = false
+            hold = pauseMs
+          }
+        } else if (pos >= max) {
+          pos = max
+          atBottom = true
           hold = pauseMs
+        } else {
+          pos += (speed * dt) / 1000
         }
-      } else if (el.scrollTop >= max - 1) {
-        atBottom = true
-        hold = pauseMs
-      } else {
-        el.scrollTop += (speed * dt) / 1000
+        el.scrollTop = pos
       }
+      raf = requestAnimationFrame(frame)
     }
 
     const start = () => {
-      if (id != null) return
-      prev = performance.now()
-      id = setInterval(step, 1000 / 60)
+      if (raf) return
+      prev = 0
+      raf = requestAnimationFrame(frame)
     }
     const stop = () => {
-      if (id != null) {
-        clearInterval(id)
-        id = null
+      if (raf) {
+        cancelAnimationFrame(raf)
+        raf = 0
       }
     }
     // Hemat baterai: hanya bergulir saat halaman benar-benar terlihat.
