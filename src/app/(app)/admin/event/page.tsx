@@ -36,7 +36,7 @@ export default async function EventSettingsPage() {
           <Field label="Penyelenggara (opsional)" name="host" defaultValue={event.host ?? ''} placeholder="Contoh: OSIS SMAN Titian Teras" />
           <label className="flex items-center gap-2 pb-2 text-sm">
             <input type="checkbox" name="liveMode" defaultChecked={event.liveMode} className="h-4 w-4" />
-            Mode LIVE (tampilkan badge di header)
+            Mode LIVE (siarkan papan skor ke publik + badge header)
           </label>
         </AdminForm>
       </div>

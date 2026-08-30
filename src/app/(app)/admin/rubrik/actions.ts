@@ -468,7 +468,7 @@ export async function setPublishedAction(_prev: PublishState, formData: FormData
     const ev = await prisma.event.findUnique({ where: { slug: EVENT_SLUG }, select: { liveMode: true } })
     if (!ev?.liveMode) {
       return {
-        error: 'Lomba belum di-Live-kan. Aktifkan "Live score" dulu di Pengaturan → Event, baru bisa publish.',
+        error: 'Lomba belum di-LIVE-kan. Aktifkan "Mode LIVE" dulu di Pengaturan → Event, baru bisa publish.',
       }
     }
   }
