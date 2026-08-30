@@ -23,7 +23,7 @@ export function PublicHeader({
           </span>
         </Link>
 
-        <div className="flex flex-1 flex-col">
+        <div className="flex min-w-0 flex-1 flex-col">
           <span className="flex items-center gap-2 font-semibold">
             {liveMode && (
               <span className="relative flex size-2.5">
@@ -32,7 +32,7 @@ export function PublicHeader({
               </span>
             )}
             {liveMode && <span className="text-sm font-bold tracking-wide text-red-600 dark:text-red-400">LIVE</span>}
-            <span className="truncate">{name}</span>
+            <span className="break-words leading-tight">{name}</span>
           </span>
           {host && <span className="text-xs text-muted-foreground">{host}</span>}
         </div>

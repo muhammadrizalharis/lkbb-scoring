@@ -49,7 +49,7 @@ export default async function LivePage() {
                   <th className="px-1.5 py-2.5 text-center sm:px-4 sm:py-3 xl:py-4">No</th>
                   <th className="px-1.5 py-2.5 sm:px-4 sm:py-3 xl:py-4">Tim</th>
                   {categories.map((c) => (
-                    <th key={c.id} className="truncate px-0.5 py-2.5 text-center sm:px-3 sm:py-3 xl:py-4" title={c.name}>
+                    <th key={c.id} className="px-0.5 py-2.5 text-center leading-tight break-words hyphens-none sm:px-3 sm:py-3 xl:py-4" title={c.name}>
                       {c.code}
                     </th>
                   ))}
@@ -64,7 +64,7 @@ export default async function LivePage() {
                       </span>
                     </td>
                     <td className="px-1.5 py-2 sm:px-4 sm:py-3 xl:py-4">
-                      <span className="block truncate text-xs font-semibold sm:text-base lg:text-lg xl:text-xl">
+                      <span className="block break-words leading-tight text-xs font-semibold sm:text-base lg:text-lg xl:text-xl">
                         {t.name}
                       </span>
                     </td>
