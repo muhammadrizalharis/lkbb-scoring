@@ -26,7 +26,7 @@ export default async function LivePage() {
 
   return (
     <div className="fixed inset-0 flex flex-col overflow-hidden bg-background">
-      <AutoRefresh />
+      <AutoRefresh intervalMs={live ? 1200 : 4000} />
       <PublicHeader name={event.name} host={event.host} liveMode={event.liveMode} />
       {!live && (
         <div className="border-b border-border/60 bg-muted/40 px-4 py-1.5 text-center text-xs text-muted-foreground">

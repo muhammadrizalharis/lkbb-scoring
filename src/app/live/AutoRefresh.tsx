@@ -70,4 +70,3 @@ export function AutoRefresh({
 
   return null
 }
-
