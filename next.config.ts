@@ -32,6 +32,8 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Bundel mandiri (server.js + node_modules terpilih) untuk image Docker ramping.
+  output: "standalone",
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

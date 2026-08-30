@@ -1,5 +1,10 @@
 # Unit systemd (mode `--user`) untuk backup database mandiri
 
+> **Catatan:** sejak seluruh stack dipindah ke Docker, backup dijalankan oleh service
+> `backup` di `docker-compose.yml`. Unit systemd di sini disimpan sebagai **fallback**
+> (mis. bila ingin menjalankan backup tanpa Docker). Untuk setup normal, cukup
+> `docker compose up -d`.
+
 Backup lkbb punya jadwal & penyimpanannya sendiri, tidak menumpang layanan lain.
 Salin kedua berkas di folder ini ke `~/.config/systemd/user/`, lalu aktifkan timer.
 

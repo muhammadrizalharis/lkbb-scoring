@@ -1,0 +1,26 @@
+# Konteks build ramping — jangan kirim/ bake hal yang tak perlu (terutama rahasia).
+node_modules
+.next
+.git
+.gitignore
+.github
+.vscode
+
+# Rahasia & data — TIDAK boleh masuk image (env diberikan lewat compose).
+.env
+.env.*
+!.env.example
+backups
+*.dump
+
+# Di-generate ulang di dalam build.
+src/generated
+
+# Artefak & berkas non-build.
+Dockerfile
+.dockerignore
+docker-compose.yml
+deploy
+tests
+*.md
+npm-debug.log*

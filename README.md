@@ -199,24 +199,38 @@ src/
 
 ## 🚀 Deployment
 
-Berjalan di mana pun Node.js tersedia. Untuk instance **selalu-aktif** dengan URL publik,
-jalankan `npm run build && npm run start` di bawah manajer proses (mis. `systemd`) lalu
-ekspos lewat **ngrok** atau **Cloudflare Tunnel**. Tanpa perlu database cloud —
-cukup PostgreSQL lokal.
+Seluruh komponen berjalan dalam **Docker** — satu perintah menyalakan semuanya:
+
+```bash
+docker compose up -d --build
+```
+
+Menjalankan 4 kontainer: **db** (PostgreSQL 18), **app** (Next.js _standalone_),
+**tunnel** (ngrok → URL publik), dan **backup** (dump harian). Semua rahasia dibaca dari
+`.env` (tidak ikut masuk image). Perintah harian:
+
+```bash
+docker compose ps                  # status semua kontainer
+docker compose logs -f app         # log aplikasi
+docker compose up -d --build app   # deploy ulang setelah ubah kode
+docker compose restart tunnel      # nyalakan ulang tunnel
+```
+
+Tanpa database cloud — cukup PostgreSQL lokal di dalam kontainer.
 
 <br/>
 
-## � Backup & pemulihan
+## 💾 Backup & pemulihan
 
-Database berjalan di **Docker Postgres 18** (`127.0.0.1:5436`) dengan backup **mandiri** —
-jadwal dan penyimpanan sendiri, tidak menumpang layanan lain.
+Database berjalan di **Docker Postgres 18** dengan backup **mandiri** — jadwal dan
+penyimpanan sendiri, tidak menumpang layanan lain.
 
-**Backup otomatis harian** lewat `systemd --user` timer (`lkbb-backup.timer`, ~03:10),
-menyimpan 30 dump terakhir di folder `backups/`:
+**Backup otomatis harian** dijalankan kontainer `backup` (pg_dump `-Fc`), menyimpan 30
+dump terakhir di folder `backups/`. Backup manual kapan saja:
 
 ```bash
-scripts/db-backup.sh                              # backup manual sekarang
-systemctl --user list-timers lkbb-backup.timer   # lihat jadwal berikutnya
+scripts/db-backup.sh                 # dump sekarang (pg_dump host → backups/)
+docker compose logs backup           # lihat log backup terjadwal
 ```
 
 **Pulihkan seluruh database** dari sebuah dump:
@@ -236,7 +250,7 @@ npm run users -- restore <username>   # aktifkan kembali akun
 
 <br/>
 
-## �📄 Lisensi
+## 📄 Lisensi
 
 Dirilis di bawah lisensi [MIT](LICENSE) — bebas dipakai, ubah, dan sebarkan.
 

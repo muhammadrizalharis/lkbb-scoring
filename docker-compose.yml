@@ -21,6 +21,80 @@ services:
       timeout: 5s
       retries: 10
 
+  # Aplikasi Next.js (standalone) — dibangun dari Dockerfile di repo ini.
+  app:
+    build:
+      context: .
+    image: lkbb-app:local
+    container_name: lkbb-app
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      # Di dalam jaringan compose, DB dijangkau lewat service "db" (bukan 5436 host).
+      DATABASE_URL: "postgresql://lkbb:${LKBB_DB_PASSWORD:?set LKBB_DB_PASSWORD di .env}@db:5432/lkbb?schema=public"
+      AUTH_SECRET: ${AUTH_SECRET:?set AUTH_SECRET di .env}
+      NEXT_PUBLIC_EVENT_SLUG: ${NEXT_PUBLIC_EVENT_SLUG:-lkbb-smantib}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      # Tetap 48300 (hanya localhost); tunnel mengakses via jaringan internal compose.
+      - "127.0.0.1:48300:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/manifest.webmanifest"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 25s
+
+  # Tunnel publik ngrok → app (domain statis Free). Menggantikan lkbb-tunnel.service.
+  tunnel:
+    image: ngrok/ngrok:latest
+    container_name: lkbb-tunnel
+    restart: unless-stopped
+    command:
+      - "http"
+      - "app:3000"
+      - "--domain=euphemism-hydroxide-caution.ngrok-free.dev"
+      - "--log=stdout"
+      - "--log-format=logfmt"
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN:?set NGROK_AUTHTOKEN di .env}
+    depends_on:
+      app:
+        condition: service_healthy
+
+  # Backup harian mandiri (pg_dump -Fc) ke ./backups; simpan 30 terakhir.
+  # Berjalan sebagai uid host (1015) agar berkas dump dimiliki user, bukan root.
+  backup:
+    image: postgres:18-alpine
+    container_name: lkbb-backup
+    restart: unless-stopped
+    user: "1015:1015"
+    environment:
+      PGPASSWORD: ${LKBB_DB_PASSWORD:?set LKBB_DB_PASSWORD di .env}
+    volumes:
+      - ./backups:/backups
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo "[backup] aktif; interval 24 jam"
+        while true; do
+          STAMP=$$(date +%Y%m%d-%H%M%S)
+          FILE="/backups/lkbb-$$STAMP.dump"
+          if pg_dump -h db -U lkbb -d lkbb -Fc > "$$FILE"; then
+            echo "[backup] OK $$FILE ($$(wc -c <"$$FILE") bytes)"
+          else
+            echo "[backup] GAGAL $$STAMP" >&2; rm -f "$$FILE"
+          fi
+          ls -1t /backups/lkbb-*.dump 2>/dev/null | tail -n +31 | xargs -r rm -f
+          sleep 86400
+        done
+
 volumes:
   lkbb-pgdata:
     name: lkbb-pgdata
