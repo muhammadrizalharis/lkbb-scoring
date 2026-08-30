@@ -3,6 +3,24 @@
 /* Mode gelap dikontrol lewat kelas .dark pada <html> (bukan hanya prefers-color-scheme). */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Paksa layout LANDSCAPE untuk papan /live di HP portrait — TANPA API orientasi
+   (jalan di semua gadget termasuk iOS) dan TETAP jalan walau rotation-lock HP aktif:
+   konten diputar 90°, jadi begitu HP diputar fisik ke samping, papan tampil tegak & lega.
+   Saat viewport benar-benar landscape (auto-rotate aktif), media query ini tak cocok →
+   rotasi lepas → papan tampil natural. Hanya untuk layar kecil (HP), bukan tablet/desktop. */
+@media (max-width: 767px) and (orientation: portrait) {
+  .live-force-landscape {
+    position: fixed;
+    inset: auto;
+    top: 0;
+    left: 0;
+    width: 100vh;
+    height: 100vw;
+    transform-origin: top left;
+    transform: translateX(100vw) rotate(90deg);
+  }
+}
+
 :root {
   --background: #eef2f8;
   --foreground: #0f172a;
