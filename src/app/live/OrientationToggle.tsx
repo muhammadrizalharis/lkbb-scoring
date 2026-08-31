@@ -36,7 +36,7 @@ export function OrientationToggle() {
       type="button"
       onClick={apply}
       aria-label={`Ganti tampilan ke mode ${target === 'portrait' ? 'potret' : 'landscape'}`}
-      className="hidden shrink-0 items-center gap-1.5 rounded-lg border border-border bg-card px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-accent max-md:inline-flex"
+      className="ml-auto hidden shrink-0 items-center gap-1.5 rounded-lg border border-border bg-card px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-accent max-md:inline-flex"
     >
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 shrink-0">
         <path d="M23 4v6h-6" />

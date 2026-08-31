@@ -47,7 +47,7 @@ export default async function LandingPage() {
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
           <Link href="/" className="flex items-center gap-2.5">
             <Image src="/logo-mark.png" alt="Paskitactical" width={596} height={414} priority className="h-9 w-auto" />
-            <span className="flex flex-col leading-tight">
+            <span className="hidden flex-col leading-tight sm:flex">
               <span className="text-sm font-bold tracking-tight">Paskitactical</span>
               <span className="text-[11px] font-medium text-muted-foreground">Penilaian &amp; Rekap Lomba</span>
             </span>
@@ -55,7 +55,7 @@ export default async function LandingPage() {
           <div className="flex flex-1 items-center justify-end gap-3">
             <Link
               href="/live"
-              className="rounded-lg bg-gradient-to-br from-primary to-blue-500 px-4 py-2 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition hover:opacity-95"
+              className="whitespace-nowrap rounded-lg bg-gradient-to-br from-primary to-blue-500 px-4 py-2 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition hover:opacity-95"
             >
               Lihat Live Score
             </Link>
