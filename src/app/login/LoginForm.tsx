@@ -47,14 +47,16 @@ export function LoginForm({ variant = 'staff' }: { variant?: Variant }) {
         className="w-full max-w-sm space-y-6 rounded-3xl bg-card/80 p-8 shadow-2xl shadow-primary/10 ring-1 ring-border backdrop-blur-xl"
       >
         <div className="flex flex-col items-center text-center">
-          <Image
-            src="/logo-mark.png"
-            alt="Paskitactical"
-            width={596}
-            height={414}
-            priority
-            className="mb-3 h-20 w-auto drop-shadow"
-          />
+          <span className="mb-3 inline-flex rounded-xl dark:bg-white dark:p-2 dark:shadow-sm dark:ring-1 dark:ring-black/5">
+            <Image
+              src="/logo-mark.png"
+              alt="Paskitactical"
+              width={596}
+              height={414}
+              priority
+              className="h-20 w-auto drop-shadow"
+            />
+          </span>
           <span className={`mb-2 rounded-full bg-gradient-to-br ${copy.accent} px-3 py-0.5 text-[11px] font-bold uppercase tracking-wider text-primary-foreground shadow`}>
             {copy.badge}
           </span>

@@ -38,14 +38,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <header className="sticky top-0 z-30 border-b border-border/80 bg-card/70 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3">
           <Link href="/beranda" className="flex items-center gap-2.5">
-            <Image
-              src="/logo-mark.png"
-              alt="Paskitactical"
-              width={596}
-              height={414}
-              priority
-              className="h-9 w-auto drop-shadow-sm"
-            />
+            <span className="inline-flex rounded-lg dark:bg-white dark:p-1 dark:shadow-sm dark:ring-1 dark:ring-black/5">
+              <Image
+                src="/logo-mark.png"
+                alt="Paskitactical"
+                width={596}
+                height={414}
+                priority
+                className="h-9 w-auto drop-shadow-sm"
+              />
+            </span>
             <span className="flex flex-col leading-tight">
               <span className="text-sm font-bold tracking-tight">Paskitactical</span>
               <span className="text-[11px] font-medium text-muted-foreground">Penilaian &amp; Rekap Lomba</span>

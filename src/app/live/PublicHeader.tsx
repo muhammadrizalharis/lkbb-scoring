@@ -17,7 +17,9 @@ export function PublicHeader({
     <header className="border-b border-border/80 bg-card/70 backdrop-blur-xl">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-2.5">
         <Link href="/live" className="flex shrink-0 items-center gap-2.5">
-          <Image src="/logo-mark.png" alt="Paskitactical" width={596} height={414} priority className="h-8 w-auto sm:h-9" />
+          <span className="inline-flex rounded-lg dark:bg-white dark:p-1 dark:shadow-sm dark:ring-1 dark:ring-black/5">
+            <Image src="/logo-mark.png" alt="Paskitactical" width={596} height={414} priority className="h-8 w-auto sm:h-9" />
+          </span>
           <span className="hidden flex-col leading-tight sm:flex">
             <span className="text-sm font-bold tracking-tight">Paskitactical</span>
             <span className="text-[11px] font-medium text-muted-foreground">Skor Langsung</span>

@@ -46,7 +46,9 @@ export default async function LandingPage() {
       <header className="sticky top-0 z-30 border-b border-border/70 bg-card/60 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
           <Link href="/" className="flex items-center gap-2.5">
-            <Image src="/logo-mark.png" alt="Paskitactical" width={596} height={414} priority className="h-9 w-auto" />
+            <span className="inline-flex rounded-lg dark:bg-white dark:p-1 dark:shadow-sm dark:ring-1 dark:ring-black/5">
+              <Image src="/logo-mark.png" alt="Paskitactical" width={596} height={414} priority className="h-9 w-auto" />
+            </span>
             <span className="hidden flex-col leading-tight sm:flex">
               <span className="text-sm font-bold tracking-tight">Paskitactical</span>
               <span className="text-[11px] font-medium text-muted-foreground">Penilaian &amp; Rekap Lomba</span>
