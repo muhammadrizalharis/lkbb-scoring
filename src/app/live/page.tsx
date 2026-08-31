@@ -2,6 +2,7 @@ import { EVENT_SLUG } from '@/lib/config'
 import { getLiveBoard } from '@/lib/live-board'
 import { AutoRefresh } from './AutoRefresh'
 import { AutoScroll } from './AutoScroll'
+import { OrientationToggle } from './OrientationToggle'
 import { PublicHeader } from './PublicHeader'
 
 export const dynamic = 'force-dynamic'
@@ -25,7 +26,10 @@ export default async function LivePage() {
   const live = event.liveMode
 
   return (
-    <div className="live-force-landscape fixed inset-0 flex flex-col overflow-hidden bg-background">
+    <>
+      {/* Tombol orientasi: mengambang & DI LUAR area yang dirotasi → selalu tegak & terlihat. */}
+      <OrientationToggle />
+      <div className="live-force-landscape fixed inset-0 flex flex-col overflow-hidden bg-background">
       {/* Terapkan preferensi orientasi sebelum paint agar tak ada kedipan landscape→potret. */}
       <script
         dangerouslySetInnerHTML={{
@@ -110,5 +114,6 @@ export default async function LivePage() {
         </div>
       )}
     </div>
+    </>
   )
 }

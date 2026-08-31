@@ -1,6 +1,5 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { OrientationToggle } from './OrientationToggle'
 
 export function PublicHeader({
   name,
@@ -26,7 +25,7 @@ export function PublicHeader({
           </span>
         </Link>
 
-        <div className="order-last flex w-full min-w-0 flex-col sm:order-none sm:w-auto sm:flex-1">
+        <div className="flex min-w-0 flex-1 flex-col">
           <span className="flex items-center gap-2 font-semibold leading-tight">
             {liveMode && (
               <span className="relative flex size-2.5 shrink-0">
@@ -39,8 +38,6 @@ export function PublicHeader({
           </span>
           {host && <span className="text-xs text-muted-foreground">{host}</span>}
         </div>
-
-        <OrientationToggle />
 
         {backHref && (
           <Link href={backHref} className="shrink-0 rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-medium text-muted-foreground transition hover:bg-accent">
