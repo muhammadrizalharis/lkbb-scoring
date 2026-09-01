@@ -105,10 +105,13 @@ const HELP = [
   '/logs — 25 baris log app',
   '/backups — daftar backup terbaru',
   '/stats — jumlah tim/juri/lembar + Mode LIVE',
+  '/url — link publik + status tunnel',
+  '/disk — sisa disk & ukuran backup',
   '',
   'Krusial (buka kunci dulu: /unlock <secret>):',
   '/live_on · /live_off — nyalakan/matikan Mode LIVE',
   '/restart — restart app',
+  '/restart_tunnel — restart tunnel (URL publik pulih)',
   '/rebuild — build ulang + deploy app',
   '/up · /down — start/stop app',
   '/backup — backup DB sekarang',
@@ -135,6 +138,14 @@ async function handle(text) {
       return send(await backups())
     case 'stats':
       return send(await stats())
+    case 'url':
+      return send(`🔗 URL publik:\n${PUBLIC_URL}\n\nTunnel: ` + (await sh("docker ps --filter name=lkbb-tunnel --format '{{.Status}}'")))
+    case 'disk': {
+      const df = await sh("df -h /home | tail -1 | awk '{print $4\" bebas dari \"$2\" (\"$5\" terpakai)\"}'")
+      const bu = await sh('du -sh backups 2>/dev/null | cut -f1')
+      const nb = await sh('ls -1 backups/*.dump 2>/dev/null | wc -l')
+      return send(`🗄️ Disk: ${df}\n💾 Backups: ${bu} (${nb} file)`)
+    }
     case 'unlock':
       if (arg && arg === SECRET) {
         unlockedUntil = Date.now() + UNLOCK_MS
@@ -146,7 +157,7 @@ async function handle(text) {
       return send('🔒 Dikunci kembali.')
   }
 
-  const crucial = ['restart', 'rebuild', 'up', 'down', 'backup', 'live_on', 'live_off']
+  const crucial = ['restart', 'rebuild', 'up', 'down', 'backup', 'live_on', 'live_off', 'restart_tunnel', 'tunnel']
   if (crucial.includes(cmd)) {
     if (!isUnlocked()) return send('🔒 Perintah krusial. Buka kunci dulu:\n/unlock <secret>')
     switch (cmd) {
@@ -174,11 +185,37 @@ async function handle(text) {
             120_000,
           ),
         )
+      case 'restart_tunnel':
+      case 'tunnel':
+        await send('⏳ Restart tunnel ngrok…')
+        await sh('docker restart lkbb-tunnel', 60_000)
+        await new Promise((r) => setTimeout(r, 4000))
+        return send('✅ Tunnel di-restart.\n' + PUBLIC_URL)
     }
   }
 
   return send(`Perintah tidak dikenal: /${cmd}\n\n${HELP}`)
 }
+
+// --- Monitor otomatis: peringatan proaktif bila situs publik down ---
+const MON_INTERVAL = 90_000
+let failStreak = 0
+let alertedDown = false
+async function monitorTick() {
+  const code = await sh(`curl -s -o /dev/null -w '%{http_code}' --max-time 12 -H 'ngrok-skip-browser-warning: 1' ${PUBLIC_URL}/manifest.webmanifest`)
+  if (code !== '200') {
+    failStreak += 1
+    if (failStreak >= 2 && !alertedDown) {
+      alertedDown = true
+      await send(`🚨 SITUS PUBLIK DOWN (HTTP ${code || 'timeout'}).\nCoba: /unlock <secret> lalu /restart_tunnel (atau /restart).`)
+    }
+  } else {
+    if (alertedDown) await send('✅ Situs publik PULIH kembali.')
+    failStreak = 0
+    alertedDown = false
+  }
+}
+setInterval(() => monitorTick().catch(() => {}), MON_INTERVAL)
 
 let offset = 0
 console.log(`[${new Date().toISOString()}] Bot ops lkbb mulai polling…`)

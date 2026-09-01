@@ -43,9 +43,12 @@ systemctl --user enable --now lkbb-bot.service
 
 Konfigurasi dari `.env`: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `PASKITACTICAL_BOT_SECRET`.
 
-Perintah **umum** (bebas): `/status` `/health` `/logs` `/backups` `/stats` `/help`.
+Perintah **umum** (bebas): `/status` `/health` `/logs` `/backups` `/stats` `/url` `/disk` `/help`.
 Perintah **krusial** butuh buka kunci dulu — kirim `/unlock <secret>` (berlaku 5 menit),
-lalu: `/live_on` `/live_off` `/restart` `/rebuild` `/up` `/down` `/backup`.
+lalu: `/live_on` `/live_off` `/restart` `/restart_tunnel` `/rebuild` `/up` `/down` `/backup`.
+
+Bot juga **memantau otomatis**: cek situs publik tiap ~90 dtk dan mengirim peringatan ke
+chat bila down (2 kali gagal berturut), lalu memberi tahu saat pulih.
 
 Perintah docker dijalankan lewat `sg docker -c` (systemd `--user` tak mewarisi grup
 docker). Butuh `loginctl enable-linger "$USER"` agar bot tetap jalan tanpa sesi login.
