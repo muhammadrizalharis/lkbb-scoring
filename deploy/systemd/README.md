@@ -47,6 +47,10 @@ Perintah **umum** (bebas): `/status` `/health` `/logs` `/backups` `/stats` `/url
 Perintah **krusial** butuh buka kunci dulu — kirim `/unlock <secret>` (berlaku 5 menit),
 lalu: `/live_on` `/live_off` `/restart` `/restart_tunnel` `/rebuild` `/up` `/down` `/backup`.
 
+Perintah **darurat** (unlock + frasa konfirmasi persis):
+`/restore YA-PULIHKAN` (pulihkan DB dari backup terakhir) dan
+`/reset_lomba YA-HAPUS` (backup pengaman lalu hapus tim/juri/nilai/penalti; rubrik & akun aman).
+
 Bot juga **memantau otomatis**: cek situs publik tiap ~90 dtk dan mengirim peringatan ke
 chat bila down (2 kali gagal berturut), lalu memberi tahu saat pulih.
 

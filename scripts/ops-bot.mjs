@@ -115,6 +115,11 @@ const HELP = [
   '/rebuild — build ulang + deploy app',
   '/up · /down — start/stop app',
   '/backup — backup DB sekarang',
+  '',
+  'Darurat (unlock + konfirmasi):',
+  '/restore YA-PULIHKAN — pulihkan DB dari backup terakhir',
+  '/reset_lomba YA-HAPUS — backup lalu hapus data lomba',
+  '',
   '/lock — kunci lagi',
 ].join('\n')
 
@@ -192,6 +197,30 @@ async function handle(text) {
         await new Promise((r) => setTimeout(r, 4000))
         return send('✅ Tunnel di-restart.\n' + PUBLIC_URL)
     }
+  }
+
+  // --- Perintah DARURAT: butuh unlock + frasa konfirmasi persis ---
+  if (cmd === 'restore') {
+    if (!isUnlocked()) return send('🔒 Buka kunci dulu: /unlock <secret>')
+    if (arg !== 'YA-PULIHKAN')
+      return send('⚠️ PULIHKAN DB dari backup TERAKHIR — ini MENIMPA seluruh data saat ini.\nKetik persis:\n/restore YA-PULIHKAN')
+    const latest = await sh('ls -t backups/*.dump 2>/dev/null | head -1')
+    if (!latest.endsWith('.dump')) return send('❌ Tidak ada file backup.')
+    await send('⏳ Memulihkan DB dari ' + latest.split('/').pop() + ' …')
+    await sh(`docker exec lkbb-postgres psql -U lkbb -d lkbb -v ON_ERROR_STOP=1 -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;'`, 60_000)
+    const out = await sh(`docker exec -i lkbb-postgres pg_restore -U lkbb -d lkbb --no-owner --no-privileges < "${latest}" 2>&1; echo "selesai rc=$?"`, 180_000)
+    await sh('docker restart lkbb-app', 90_000)
+    return send(`✅ DB dipulihkan dari ${latest.split('/').pop()} (app di-restart).\n${out.slice(-400)}`)
+  }
+
+  if (cmd === 'reset_lomba') {
+    if (!isUnlocked()) return send('🔒 Buka kunci dulu: /unlock <secret>')
+    if (arg !== 'YA-HAPUS')
+      return send('⚠️ HAPUS semua tim/juri/nilai/penalti lomba (rubrik & akun tetap aman).\nBackup pengaman dibuat otomatis dulu. Ketik persis:\n/reset_lomba YA-HAPUS')
+    await send('⏳ Backup pengaman lalu reset data lomba…')
+    const bk = await sh(`docker exec lkbb-backup sh -c 'F=/backups/lkbb-prereset-$(date +%Y%m%d-%H%M%S).dump; pg_dump -h db -U lkbb -d lkbb -Fc > "$F" && basename "$F"'`, 120_000)
+    const del = await sh(`docker exec lkbb-postgres psql -U lkbb -d lkbb -v ON_ERROR_STOP=1 -c 'DELETE FROM "Penalty"; DELETE FROM "ScoreSheet"; DELETE FROM "Judge"; DELETE FROM "Team"; UPDATE "Event" SET "recapOpen"=false;' 2>&1`, 60_000)
+    return send(`✅ Data lomba direset (rubrik & akun aman).\n🛡️ Backup pra-reset: ${bk}\n${del}\n\nPulihkan bila perlu: /restore YA-PULIHKAN`)
   }
 
   return send(`Perintah tidak dikenal: /${cmd}\n\n${HELP}`)
