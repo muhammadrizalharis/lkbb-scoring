@@ -27,3 +27,25 @@ Catatan: `lkbb-backup.service` memanggil `scripts/db-backup.sh`, yang memakai
 `pg_dump` PostgreSQL 18 dari host lewat TCP (`127.0.0.1:5436`) — bukan `docker exec` —
 sehingga tidak butuh izin docker socket dan aman dijalankan oleh timer `--user`.
 Password DB dibaca dari `.env` (`LKBB_DB_PASSWORD`), yang tidak pernah masuk repo.
+
+---
+
+## Bot ops Telegram (`lkbb-bot.service`)
+
+Bot Telegram untuk mengelola aplikasi dari HP (long polling, hanya melayani chat
+developer `TELEGRAM_CHAT_ID`). Skrip: `scripts/ops-bot.mjs`.
+
+```bash
+cp deploy/systemd/lkbb-bot.service ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now lkbb-bot.service
+```
+
+Konfigurasi dari `.env`: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `PASKITACTICAL_BOT_SECRET`.
+
+Perintah **umum** (bebas): `/status` `/health` `/logs` `/backups` `/stats` `/help`.
+Perintah **krusial** butuh buka kunci dulu — kirim `/unlock <secret>` (berlaku 5 menit),
+lalu: `/live_on` `/live_off` `/restart` `/rebuild` `/up` `/down` `/backup`.
+
+Perintah docker dijalankan lewat `sg docker -c` (systemd `--user` tak mewarisi grup
+docker). Butuh `loginctl enable-linger "$USER"` agar bot tetap jalan tanpa sesi login.

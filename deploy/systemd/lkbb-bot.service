@@ -1,0 +1,16 @@
+[Unit]
+Description=LKBB Scoring — Bot ops Telegram (long polling)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/muhammadrizalharis/lkbb-scoring
+# Node + sg/docker/curl di PATH. Docker diakses via `sg docker -c` di dalam skrip.
+Environment=PATH=/home/muhammadrizalharis/.nvm/versions/node/v22.23.1/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/home/muhammadrizalharis/.nvm/versions/node/v22.23.1/bin/node /home/muhammadrizalharis/lkbb-scoring/scripts/ops-bot.mjs
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target
